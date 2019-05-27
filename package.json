@@ -1,0 +1,30 @@
+{
+  "name": "Gridact",
+  "version": "1.0.0",
+  "description": "Your Excellent React Grid Component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/babel src --out-file index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recraftstudio/dummy-react-npm-module.git"
+  },
+  "author": "Filip Debef",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/recraftstudio/dummy-react-npm-module/issues"
+  },
+  "homepage": "https://github.com/recraftstudio/dummy-react-npm-module#readme",
+  "peerDependencies": {
+    "react": "^16.6.1",
+    "react-dom": "^16.6.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0"
+  }
+}

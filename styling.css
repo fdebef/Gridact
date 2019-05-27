@@ -1,0 +1,174 @@
+:root {
+    --mygrey: #ced4da;
+    --mygreybackground: #e9ecef
+}
+
+.FFInputDesc {
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    border: 1px solid var(--mygrey);
+    background: var(--mygreybackground);
+    -webkit-border-radius: 3px 0px 0px 3px;
+    -moz-border-radius: 3px 0px 0px 3px;
+    border-radius: 3px 0px 0px 3px;
+}
+
+.FFInputField {
+    height: 35px;
+    width: 120px;
+    border: 1px solid var(--mygrey);
+    padding-right: 5px;
+    padding-left: 5px;
+    border-left: 0px;
+    background: #cff9c6;
+    -webkit-border-radius: 0px 3px 3px 0px;
+    -moz-border-radius: 0px 3px 3px 0px;
+    border-radius: 0px 3px 3px 0px;
+}
+
+.FFInputSelect {
+    height: 35px;
+    border: 1px solid var(--mygrey);
+    background: #cff9c6;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+}
+
+.rt-td {
+    line-height: 20px !important;
+    padding: 4px !important;
+}
+
+.FFTransHeadDesc {
+    height: 25px;
+    width: 150px;
+    padding: 0px 5px 0px 5px
+}
+
+.FFTransHeadValue {
+    height: 25px;
+    width: 200px;
+    padding: 0px 5px 0px 5px
+}
+
+div.react-grid-HeaderCell {
+    padding: 2px 0px 0px 0px;
+    text-align: center;
+}
+
+button.forward {
+    background: none;
+    border: 0;
+    color: dodgerblue;
+}
+
+button.zero {
+    background: none;
+    border: 0;
+}
+
+@keyframes cellFocus {
+    0% {
+        background-color: white;
+    }
+    50% {
+        background-color: lightskyblue;
+    }
+    100% {
+        background-color: limegreen;
+    }
+}
+
+td:focus {
+    background-color: limegreen !important;
+    animation-name: cellFocus;
+    animation-duration: 250ms;
+}
+
+@keyframes rowgeneration {
+    0% {
+        background-color: white;
+    }
+    50% {
+        background-color: lightskyblue;
+    }
+    100% {
+        background-color: white;
+    }
+}
+
+tr.flash {
+    background-color: white;
+    animation-name: rowgeneration;
+    animation-duration: 250ms;
+}
+
+button.add {
+    height: 35px;
+    border: 0 solid rgba(0, 0, 0, 0);
+    background: limegreen;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+}
+
+button.add.left {
+    border: none;
+    outline: none;
+    background: limegreen;
+    -webkit-border-radius: 3px 0px 0px 3px;
+    -moz-border-radius: 3px 0px 0px 3px;
+    border-radius: 3px 0px 0px 3px;
+}
+
+button.add.right {
+    border: none;
+    outline: none;
+    background: limegreen;
+    -webkit-border-radius: 0px 3px 3px 0px;
+    -moz-border-radius: 0px 3px 3px 0px;
+    border-radius: 0px 3px 3px 0px;
+}
+
+
+button.add.right:focus, button.add.left:focus {
+    background: lightgreen;
+}
+
+
+button.remove {
+    outline: none;
+    height: 35px;
+    border: none;
+    background: orangered;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+}
+
+td {
+    height: 30px
+}
+
+.moverlay {
+    background: rgba(255,150,150,0.9);
+    font-size: 0.8em;
+    color: white;
+    min-width: 100px;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+     -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+
+}
+
