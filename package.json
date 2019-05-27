@@ -1,11 +1,11 @@
 {
-  "name": "Gridact",
+  "name": "gridact",
   "version": "1.0.0",
   "description": "Your Excellent React Grid Component",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/babel src --out-file index.js"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -18,13 +18,27 @@
   },
   "homepage": "https://github.com/recraftstudio/dummy-react-npm-module#readme",
   "peerDependencies": {
-    "react": "^16.6.1",
-    "react-dom": "^16.6.3"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "mdi-react": "^5.4.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/preset-react": "^7.0.0"
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.32.2",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.4.1"
+  },
+  "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-async-to-generator": "^7.4.4",
+    "babel-regenerator-runtime": "^6.5.0",
+    "css-loader": "^2.1.1",
+    "mdi-react": "^5.4.0",
+    "style-loader": "^0.23.1"
   }
 }

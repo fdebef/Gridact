@@ -6,7 +6,6 @@ import ChevronDoubleLeftIcon from 'mdi-react/ChevronDoubleLeftIcon';
 import ChevronDoubleRightIcon from 'mdi-react/ChevronDoubleRightIcon';
 import ChevronRightIcon from 'mdi-react/ChevronRightIcon';
 import TableSearchIcon from 'mdi-react/TableSearchIcon';
-import TableRowAddBeforeIcon from 'mdi-react/TableRowAddBeforeIcon';
 import TableRowAddAfterIcon from 'mdi-react/TableRowAddAfterIcon';
 import TableRowRemoveIcon from 'mdi-react/TableRowRemoveIcon';
 import FileDocumentBoxesOutlineIcon from 'mdi-react/FileDocumentBoxesOutlineIcon';
@@ -19,7 +18,7 @@ import DataTable from './DataTable';
 let i = 0;
 
 
-const Index = (props) => {
+const GridAct = (props) => {
   i++;
   const {
     data, colDefs, tableClasses, pagingOptions, rowClass, serverSideEdit, primaryKey, superDivClass,
@@ -411,6 +410,6 @@ const Index = (props) => {
 };
 
 
-export default React.memo(Index);
+export default React.memo(GridAct);
 
 //

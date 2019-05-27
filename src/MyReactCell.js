@@ -56,7 +56,6 @@ const MyReactCell = (props) => {
   }, [cellValue]);
 
   useEffect(() => {
-    console.log('NEW VALUE: ', valueState);
   }, [valueState]);
 
 
@@ -118,7 +117,6 @@ const MyReactCell = (props) => {
   // Space pressed must be held both in keyDown and keyPress - it is not fired
   // in keyPress, so we have to setup spacePressed variable to allow space
   // processing in keyDown
-  console.log();
   const keyDn = (e) => {
     switch (editMode.current.active) {
       case false: // non editing mode
@@ -156,7 +154,6 @@ const MyReactCell = (props) => {
             editMode.current = {active: false, curValue: editMode.current.curValue}; // only disable active
             forceRender(p => p + 1)
             if (!(editMode.current.curValue === sanitizedInnerText)) {
-              console.log('UPDATING....')
               serverUpdate(sanitizedInnerText)
                 .then((updRow) => {
                   Promise.resolve().then(() => {
@@ -214,7 +211,6 @@ const MyReactCell = (props) => {
   const onBlr = (e) => {
     if (editMode.current.active) { // leaving cell without Enter
       const cvBlr = editMode.current.curValue;
-      console.log('BLUR FROM ACTIVE MODE: ', cvBlr);
       Promise.resolve().then(() => {
         setValueState(cellRef.current.innerText);
         setValueState(cvBlr); // set original value
@@ -292,10 +288,3 @@ const MyReactCell = (props) => {
   );
 };
 export default MyReactCell;
-
-
-// window.addEventListener('resize', handler);
-//       if (!cellRef.current) return null;
-//       modLeft = cellRef.current.getBoundingClientRect().left + 10;
-//       modTop = cellRef.current.getBoundingClientRect().top + 25;
-//       console.log('.................', modLeft, modTop);

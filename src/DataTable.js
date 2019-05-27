@@ -63,7 +63,6 @@ const DataTable = (props) => {
         calcX = xCount - 1;
         break;
       default:
-        console.log('NOTHING');
         break;
     }
     fnSetActiveCell([calcX, calcY]);
