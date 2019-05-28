@@ -181,11 +181,11 @@ colDefs is object, where keys are column codes, values are column definitions it
   `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
   #### name
-  Type: string **\<mandatory>**
+  Type: string **<mandatory>**
   Name of column in table header
   
   ### width
-  Type: integer \<option>
+  Type: integer <option>
   Set width of current column. Default `<td>` css style is `overflow: hidden`.
   
   #### editable, sortable
@@ -200,7 +200,7 @@ colDefs is object, where keys are column codes, values are column definitions it
   There two filter options for values users can write to cell._  
   
   #### filterEditChar
-  Type: RegExp | function \<optional>
+  Type: RegExp | function <optional>
   This option is applied directly onKeyPress event - it does not let user write the characters you specify.
   If RegExp is provided, it is passed to `character_typed.match()`.
   Function is passed three arguments: `(character_typed, cell_value_before_edit, row_data)` Must return `true` or `false`.
