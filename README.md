@@ -146,7 +146,7 @@ Type: String
 Type: Boolean<br>
 If `true`, on `enter` cursor moves down. otherwise moves right.
 
-## colDefs / **\<mandatory>** ##
+## colDefs ## **<mandatory>**
 *Columns definitions*
 Type: _Object_
 
@@ -169,61 +169,62 @@ colDefs is object, where keys are column codes, values are column definitions it
     hidden: false
     }
   },
-  ...}
-  ```
-  ### Column definition properties ###
-  #### cellRender ####
-  Type: function | string \<option>
-  If undefined, the cell is rendered with value provided in data.
-  If string is provided, the string is returned.
-  Function is passed `cell_value` and `row_data`. This means, you can render the cell based on other values in row.<br>
-  *Example:*
-  `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
+...}
+```
+### Column definition properties ###
+#### cellRender ####
+Type: function | string \<option>
+If undefined, the cell is rendered with value provided in data.
+If string is provided, the string is returned.
+Function is passed `cell_value` and `row_data`. This means, you can render the cell based on other values in row.<br>
+*Example:*
+`cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
-  #### name
-  Type: string **<mandatory>**
-  Name of column in table header
+#### name ###
+Type: string **<mandatory>**
+Name of column in table header
   
-  ### width
-  Type: integer <option>
-  Set width of current column. Default `<td>` css style is `overflow: hidden`.
+### width ###
+Type: integer <option>
+Set width of current column. Default `<td>` css style is `overflow: hidden`.
+
+### editable, sortable ###
+Type: Boolean
+Column cells will be editable and sortable.
   
-  #### editable, sortable
-  Type: Boolean
-  Column cells will be editable and sortable.
+### hidden ###
+Type: Boolean
+Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
+from other columns but the other columns you do not want to show.
   
-  #### hidden
-  Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
-  from other columns but the other columns you do not want to show.
+_As the inline edit is build upon contentEditable, I paid a lot of attention to sanitize input text to avoid XSS. 
+There two filter options for values users can write to cell._  
+ 
+### filterEditChar ###
+Type: RegExp | function <optional>
+This option is applied directly onKeyPress event - it does not let user write the characters you specify.
+If RegExp is provided, it is passed to `character_typed.match()`.
+Function is passed three arguments: `(character_typed, cell_value_before_edit, row_data)` Must return `true` or `false`.
+True = character is allowed, false = disallowed.
+*Default value* is
+`(char, CellValue, rowData) => return char.match(/[a-zA-ZščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮ0-9 ]/);`
+Allowed are only alphanumeric characters included Czech ones.
   
-  _As the inline edit is build upon contentEditable, I paid a lot of attention to sanitize input text to avoid XSS. 
-  There two filter options for values users can write to cell._  
+### filterEditValue ###
+Because above mentioned option does not block pasting from clipboard, and I didn't want to forbid it generally, 
+we have to check the final value user sends to your serverSideEdit function and which will be displayed in table.
+As this is potential XSS risc, pay close attention to this function.
+Function is passed three arguments: `(new_cell_value, cell_value_before_edit, row_data)` Must return sanitized string.
+*Default value* is
+`(newValue, cellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, ''))`
   
-  #### filterEditChar
-  Type: RegExp | function <optional>
-  This option is applied directly onKeyPress event - it does not let user write the characters you specify.
-  If RegExp is provided, it is passed to `character_typed.match()`.
-  Function is passed three arguments: `(character_typed, cell_value_before_edit, row_data)` Must return `true` or `false`.
-  True = character is allowed, false = disallowed.
-  *Default value* is
-  `(char, CellValue, rowData) => return char.match(/[a-zA-ZščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮ0-9 ]/);`
-  Allowed are only alphanumeric characters included Czech ones.
-  
-  #### filterEditValue 
-  Because above mentioned option does not block pasting from clipboard, and I didn't want to forbid it generally, 
-  we have to check the final value user sends to your serverSideEdit function and which will be displayed in table.
-  As this is potential XSS risc, pay close attention to this function.
-  Function is passed three arguments: `(new_cell_value, cell_value_before_edit, row_data)` Must return sanitized string.
-  *Default value* is
-  `(newValue, cellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, ''))`
-  
-  ## Styling
-  You can find basic stylesheet in src on GitHub, you can simply change it on your own.
-  For best results I do recommend using Bootstrap ^4.3 and styling table, rows and cells with bootstrap classes.
-  
-  # Further development
-  I'll be glad if you leave me a message. What you miss, what you want, what you like.
-  What can be added in the future:
+## Styling
+You can find basic stylesheet in src on GitHub, you can simply change it on your own.
+For best results I do recommend using Bootstrap ^4.3 and styling table, rows and cells with bootstrap classes.
+ 
+# Further development
+I'll be glad if you leave me a message. What you miss, what you want, what you like.
+What can be added in the future:
   - customizable icons
   - custom placement of Search, add / remove buttons and paging options.
   - better page selector 
