@@ -21,15 +21,29 @@ let i = 0;
 const GridAct = (props) => {
   i++;
   const {
-    data, colDefs, tableClasses, pagingOptions, rowClass, serverSideEdit, primaryKey, superDivClass,
+    data, colDefs, tableClasses, pagingOptions, fnRowClass, serverSideEdit, primaryKey, wrapperDivClass,
     showFilter, addRemove, pageSelector, pagingSelector, searchPlaceHolder, onEnterMoveDown
   } = props;
   const [pageActual, setPageActual] = useState(undefined);
-  const [pageLength, setPageLength] = useState(pagingOptions[0]);
+  const [pageLength, setPageLength] = useState();
   const [tableFilterValue, setTableFilterValue] = useState('');
   const [sortState, setSortState] = useState({ col: undefined, dir: undefined });
   const [fRen, forceRender] = useState(0);
 
+  let grPagingOptions = [10, 20, 50]
+
+  if (pagingOptions) {
+    grPagingOptions = pagingOptions[0]
+  }
+
+  useEffect(() => {
+    if (pagingOptions) {
+    setPageLength(grPagingOptions[0])
+      }
+    else {
+      setPageLength(10)
+    }
+  }, [pagingOptions])
 
   // --------------------------------------------------------------------------
   // ref to search field
@@ -393,7 +407,7 @@ const GridAct = (props) => {
           sortTable={fnSortTable}
           sortState={sortState}
           fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
-          rowClass={rowClass}
+          fnRowClass={fnRowClass}
           serverSideEdit={serverSideEdit}
           primaryKey={primaryKey}
           fnSetActiveCell={fnSetActiveCell}
@@ -401,7 +415,7 @@ const GridAct = (props) => {
           fnUpdateRefStore={fnUpdateRefStore}
           fnGetRefStore={fnGetRefStore}
           removeRow={removeRow}
-          superDivClass={superDivClass}
+          wrapperDivClass={wrapperDivClass}
           onEnterMoveDown={onEnterMoveDown}
         />
       </div>

@@ -7,7 +7,7 @@ const MyReactRow = (props) => {
   const {
     row, y, colRowsCount, fnUpdateRefStore,
     fnSetActiveCell, colDefs, fnNavigation,
-    fnUpdateDataOnEditWithoutRender, rowClass,
+    fnUpdateDataOnEditWithoutRender, fnRowClass,
     serverSideEdit, primaryKey, removeRow
   } = props;
 
@@ -36,11 +36,11 @@ const MyReactRow = (props) => {
   // Calculate rowClassNames, based on rowClass parameter
   // tightly controlled on data types
   const rowClassNames = (rwDt) => {
-    if (!rowClass) return undefined;
-    if (typeof rowClass === 'string') return rowClass;
-    if (Array.isArray(rowClass)) return rowClass.join(' ');
-    if (typeof rowClass === 'function') {
-      const calcClass = rowClass(rwDt);
+    if (!fnRowClass) return undefined;
+    if (typeof fnRowClass === 'string') return fnRowClass;
+    if (Array.isArray(fnRowClass)) return fnRowClass.join(' ');
+    if (typeof fnRowClass === 'function') {
+      const calcClass = fnRowClass(rwDt);
       if (!calcClass) return undefined;
       if (typeof calcClass === 'string') return calcClass;
       if (Array.isArray(calcClass)) return calcClass.join(' ');

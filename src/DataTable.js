@@ -87,7 +87,7 @@ const DataTable = (props) => {
 
   if (data.length) {
     return (
-      <div className={superDivClass.join(' ')}>
+      <div className={wrapperDivClass.join(' ')}>
         <table
           role="grid"
           className={[...tableClasses].join(' ')}
