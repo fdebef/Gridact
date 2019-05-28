@@ -181,22 +181,18 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
   
 #### name ###
 Type: string **<mandatory>**
-    
 Name of column in table header
   
 ### width ###
 Type: integer <option>
-    
 Set width of current column. Default `<td>` css style is `overflow: hidden`.
 
 ### editable, sortable ###
 Type: Boolean
-
 Column cells will be editable and sortable.
   
 ### hidden ###
 Type: Boolean
-
 Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
 from other columns but the other columns you do not want to show.
   
