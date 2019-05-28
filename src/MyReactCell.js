@@ -36,7 +36,7 @@ const MyReactCell = (props) => {
       case '[object RegExp]':
         return char.match(colDefs[col].filterEditValue);
       case '[object Undefined]':
-        return true;
+        return char.match(/[a-zA-ZščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮ0-9 ]/);
       default:
         throw Error(`Not valid filterEditValue. Must be Function, RegExp or Undefined. Is ${
           Object.prototype.toString.call(colDefs[col].filterEditChar)}`);
@@ -45,19 +45,11 @@ const MyReactCell = (props) => {
 
   const [valueState, setValueState] = useState(undefined);
   const [renderCount, forceRender] = useState(0);
-  const editMode = useRef({active: false, curValue: undefined});
-  const [modalWarningActive, setModalWarningActive] = useState({active: false, text: undefined});
+  const editMode = useRef({ active: false, curValue: undefined });
+  const [modalWarningActive, setModalWarningActive] = useState({ active: false, text: undefined });
   // define ref to cell and store it to the store
   const cellRef = useRef(null);
   fnUpdateRefStore(x, y, cellRef);
-
-  useEffect(() => {
-    setValueState(cellValue);
-  }, [cellValue]);
-
-  useEffect(() => {
-  }, [valueState]);
-
 
   // cell renderer based on colDefs
   const cellRenderer = (celVal, rw) => {
@@ -65,6 +57,14 @@ const MyReactCell = (props) => {
     if ((typeof colDefs[col].cellRender) === 'function') return (colDefs[col].cellRender(celVal, rw));
     return colDefs[col].cellRender;
   };
+
+  useEffect(() => {
+    setValueState(cellRenderer(cellValue, row));
+  }, [cellValue]);
+
+  useEffect(() => {
+  }, [valueState]);
+
 
   /* eslint-disable max-len */
   const setEndOfContenteditable = (contentEditableElement) => {
@@ -80,7 +80,7 @@ const MyReactCell = (props) => {
     const operData = {};
     operData[col] = newCellValue;
     operData[primaryKey] = row[primaryKey]; // data for server must be in {line_id: 12932, some_col: 'new value'}
-    const dataToSend = {operation: 'edit', data: operData};
+    const dataToSend = { operation: 'edit', data: operData };
     return new Promise((resolve, reject) => {
       serverSideEdit(dataToSend)
         .then((rs) => { // successfull return
@@ -125,14 +125,15 @@ const MyReactCell = (props) => {
             if (colDefs[col].editable) {
               e.preventDefault();
               // curValue is calculated from data - better then taken from innerText, that might be changed
-              editMode.current = {active: true, curValue: cellRef.current.innerText};
+              editMode.current = { active: true, curValue: cellValue };
+              setValueState(cellValue);
               forceRender(p => p + 1);
               setEndOfContenteditable(cellRef.current);
             }
             break;
           case [27].includes(e.keyCode):
             e.preventDefault();
-            setModalWarningActive({active: false, text: false});
+            setModalWarningActive({ active: false, text: false });
             break;
           case [37, 38, 39, 40, 36, 35, 33, 34, 9].includes(e.keyCode): // arrow navigation
             e.preventDefault();
@@ -151,8 +152,8 @@ const MyReactCell = (props) => {
           case [9, 13].includes(e.keyCode): // ENTER + TAB - leave with save
             e.preventDefault();
             const sanitizedInnerText = fnFilterEditedValue(cellRef.current.innerText, valueState, row);
-            editMode.current = {active: false, curValue: editMode.current.curValue}; // only disable active
-            forceRender(p => p + 1)
+            editMode.current = { active: false, curValue: editMode.current.curValue }; // only disable active
+            forceRender(p => p + 1);
             if (!(editMode.current.curValue === sanitizedInnerText)) {
               serverUpdate(sanitizedInnerText)
                 .then((updRow) => {
@@ -163,9 +164,9 @@ const MyReactCell = (props) => {
                     setValueState(updRow[col]);
                     fnUpdateDataOnEditWithoutRender(updRow); // update data2 in Grid with new row
                     fnUpdateRowData(updRow); // update whole current row Data
-                    setModalWarningActive({active: false, text: null});
+                    setModalWarningActive({ active: false, text: null });
                   });
-                  editMode.current = {active: false, curValue: undefined};
+                  editMode.current = { active: false, curValue: undefined };
                   fnNavigation(913);
                 })
                 .catch((err) => {
@@ -173,10 +174,10 @@ const MyReactCell = (props) => {
                   const cv = editMode.current.curValue;
                   Promise.resolve().then(() => {
                     setValueState(cellRef.current.innerText);
-                    setValueState(cv);
-                    setModalWarningActive({active: true, text: err});
+                    setValueState(cellRenderer(cv));
+                    setModalWarningActive({ active: true, text: err });
                   });
-                  editMode.current = {active: false, curValue: undefined};
+                  editMode.current = { active: false, curValue: undefined };
                 });
             }
             break;
@@ -186,10 +187,10 @@ const MyReactCell = (props) => {
             const cv = editMode.current.curValue;
             Promise.resolve().then(() => {
               setValueState(`${cellRef.current.innerText}`);
-              setValueState(cv);
+              setValueState(cellRenderer(cv));
             });
-            editMode.current = {active: false, curValue: undefined};
-            setModalWarningActive({active: false, text: undefined});
+            editMode.current = { active: false, curValue: undefined };
+            setModalWarningActive({ active: false, text: undefined });
             break;
           default:
             break;
@@ -216,9 +217,9 @@ const MyReactCell = (props) => {
         setValueState(cvBlr); // set original value
         fnSetActiveCell([undefined, undefined]);
       });
-      editMode.current = {active: false, curValue: undefined};
+      editMode.current = { active: false, curValue: undefined };
     }
-    if (modalWarningActive.active) setModalWarningActive({active: false, text: undefined});
+    if (modalWarningActive.active) setModalWarningActive({ active: false, text: undefined });
   };
 
   const onFoc = () => {
@@ -226,13 +227,13 @@ const MyReactCell = (props) => {
   };
 
 
-  const cellClassNames = (rwDt) => {
-    const userClass = colDefs[col].cellClass;
+  const cellClassNames = (celVal, rwDt) => {
+    const userClass = colDefs[col].fnCellClass;
     if (!userClass) return undefined;
     if (typeof userClass === 'string') return userClass;
     if (Array.isArray(userClass)) return userClass.join(' ');
     if (typeof userClass === 'function') {
-      const calcClass = userClass(rwDt);
+      const calcClass = userClass(celVal, rwDt);
       if (!calcClass) return undefined;
       if (typeof calcClass === 'string') return calcClass;
       if (Array.isArray(calcClass)) return calcClass.join(' ');
@@ -241,7 +242,7 @@ const MyReactCell = (props) => {
   };
 
 
-  const ModalWarning = ({show, children}) => {
+  const ModalWarning = ({ show, children }) => {
     let modLeft = 0;
     let modTop = 0;
 
@@ -252,7 +253,7 @@ const MyReactCell = (props) => {
       <div
         key={`modaldiv-${String(y)}-${String(x)}`}
         className="moverlay d-flex flex-row justify-content-center align-items-center"
-        style={{top: modTop, left: modLeft}}
+        style={{ top: modTop, left: modLeft }}
       >
         {children}
       </div>
@@ -260,9 +261,16 @@ const MyReactCell = (props) => {
     return show && ReactDOM.createPortal(modalDiv, document.getElementById('modalEl'));
   };
 
+  const widthStyle = (width) => {
+    if (width) {
+      return ({ width });
+    }
+  };
+
   return (
     <td
-      className={cellClassNames(row)}
+      className={cellClassNames(cellValue, row)}
+      style={{ ...widthStyle(colDefs[col].width) }}
       role="gridcell"
       key={`${String(y)}-${String(x)}`}
       ref={cellRef}
@@ -275,7 +283,7 @@ const MyReactCell = (props) => {
       onBlur={onBlr}
       onKeyPress={keyPs}
     >
-      {cellRenderer(valueState, row)}
+      {valueState}
       {modalWarningActive.active
       && (
         <ModalWarning show>

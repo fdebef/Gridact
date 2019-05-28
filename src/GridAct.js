@@ -30,20 +30,15 @@ const GridAct = (props) => {
   const [sortState, setSortState] = useState({ col: undefined, dir: undefined });
   const [fRen, forceRender] = useState(0);
 
-  let grPagingOptions = [10, 20, 50]
+  let grPagingOptions = [10, 20, 50];
 
   if (pagingOptions) {
-    grPagingOptions = pagingOptions[0]
+    grPagingOptions = pagingOptions;
   }
 
   useEffect(() => {
-    if (pagingOptions) {
-    setPageLength(grPagingOptions[0])
-      }
-    else {
-      setPageLength(10)
-    }
-  }, [pagingOptions])
+    setPageLength(grPagingOptions[0]);
+  }, [pagingOptions]);
 
   // --------------------------------------------------------------------------
   // ref to search field
@@ -144,7 +139,6 @@ const GridAct = (props) => {
     setPageData(tableData.current.slice(0, newPageLength));
     setPageActual(1); // always go back to first page
     setPageLength(newPageLength); // set new page length
-
   };
 
   // --------------------------------------------------------------------------
@@ -256,7 +250,7 @@ const GridAct = (props) => {
     setPageActual(1);
     setTableFilterValue('');
     setSortState({ col: undefined, dir: undefined });
-    serverSideEdit({ operation: 'newRow' })
+    serverSideEdit({ operation: 'new' })
       .then((n) => {
         const nR = JSON.parse(n).data;
         data2.current.unshift(nR);
@@ -323,14 +317,16 @@ const GridAct = (props) => {
           changePageLength(parseInt(e.target.value, 0));
         }}
       >
-        {pagingOptions.sort((a, b) => (a - b))
+        {grPagingOptions.sort((a, b) => (a - b))
           .map(opt => (<option key={opt} value={opt}>{opt}</option>))}
       </select>
     </>
   );
 
+  console.log('-----------tableData', tableData.current.length, pageLength);
+
   const PageSelector = () => (
-    <div>
+    <div className="d-flex flex-row align-items-center justify-content-center">
       <button key="1" type="button" className="forward" onClick={() => changePage('first')}>
         {1}
         <ChevronDoubleLeftIcon key="2" />
@@ -353,8 +349,12 @@ const GridAct = (props) => {
 
   const AddRemoveButtons = () => (
     <div className="d-flex flex-row">
-      <button type="button" title="Add new row..." onClick={e => addRow()} className="add"><TableRowAddAfterIcon /></button>
-      <button type="button" title="Remove row with cursor..." onClick={removeRow} className="ml-2 remove"><TableRowRemoveIcon /></button>
+      <button type="button" title="Add new row..." onClick={e => addRow()} className="add">
+        <TableRowAddAfterIcon />
+      </button>
+      <button type="button" title="Remove row with cursor..." onClick={removeRow} className="ml-2 remove">
+        <TableRowRemoveIcon />
+      </button>
     </div>
   );
 
@@ -367,21 +367,21 @@ const GridAct = (props) => {
         align-items-center"
         >
           {showFilter && (
-          <div className="d-flex flex-row" key="16">
-            <span className="FFInputDesc"><TableSearchIcon /></span>
-            <input
-              className="FFInputField mr-1"
-              style={{ width: '200px' }}
-              key="myinputfield"
-              type="text"
-              placeholder={searchPlaceHolder}
-              value={tableFilterValue}
-              onChange={fnChangeTableFilter}
-              ref={inputFieldRef}
-            />
-          </div>
+            <div className="d-flex flex-row" key="16">
+              <span className="FFInputDesc"><TableSearchIcon /></span>
+              <input
+                className="FFInputField mr-1"
+                style={{ width: '200px' }}
+                key="myinputfield"
+                type="text"
+                placeholder={searchPlaceHolder}
+                value={tableFilterValue}
+                onChange={fnChangeTableFilter}
+                ref={inputFieldRef}
+              />
+            </div>
           )
-        }
+          }
         </div>
         <div className="col-xl-4 d-flex flex-row mt-3 mt-xl-0
         align-items-center

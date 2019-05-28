@@ -64,6 +64,10 @@ button.forward {
     background: none;
     border: 0;
     color: dodgerblue;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
 }
 
 button.zero {
@@ -150,8 +154,13 @@ button.remove {
     border-radius: 3px 3px 3px 3px;
 }
 
+table {
+    table-layout: fixed;
+}
+
 td {
-    height: 30px
+    height: 30px;
+    overflow: hidden;
 }
 
 .moverlay {

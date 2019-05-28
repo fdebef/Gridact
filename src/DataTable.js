@@ -9,8 +9,8 @@ import MyReactRow from './MyReactRow';
 const DataTable = (props) => {
   const {
     data, colDefs, tableClasses, sortTable, sortState, fnGetActiveCell, fnSetActiveCell,
-    fnUpdateDataOnEditWithoutRender, rowClass, serverSideEdit, primaryKey,
-    fnUpdateRefStore, fnGetRefStore, removeRow, superDivClass, onEnterMoveDown
+    fnUpdateDataOnEditWithoutRender, fnRowClass, serverSideEdit, primaryKey,
+    fnUpdateRefStore, fnGetRefStore, removeRow, wrapperDivClass, onEnterMoveDown
   } = props;
 
   // --------------------------------------------------------------------------
@@ -84,13 +84,44 @@ const DataTable = (props) => {
     return null;
   };
 
+  const wrpClass = (wrpProp) => {
+    switch (Object.prototype.toString.call(wrpProp)) {
+      case '[object Array]':
+        return wrpProp.join(' ');
+      case '[object String]':
+        return wrpProp;
+      case '[object Undefined]':
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const tblClass = (tblClsProp) => {
+    switch (Object.prototype.toString.call(tblClsProp)) {
+      case '[object Array]':
+        return tblClsProp.join(' ');
+      case '[object String]':
+        return tblClsProp;
+      case '[object Undefined]':
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const widthStyle = (width) => {
+    if (width) {
+      return ({ width });
+    }
+  };
 
   if (data.length) {
     return (
-      <div className={wrapperDivClass.join(' ')}>
+      <div className={wrpClass(wrapperDivClass)}>
         <table
           role="grid"
-          className={[...tableClasses].join(' ')}
+          className={tblClass(tableClasses)}
         >
           <thead>
             <tr>
@@ -99,8 +130,10 @@ const DataTable = (props) => {
                   className={colDefs[col].thClass}
                   key={col}
                   role="gridcell"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => { sortTable(col); }}
+                  style={{ ...widthStyle(colDefs[col].width), cursor: 'pointer' }}
+                  onClick={() => {
+                    sortTable(col);
+                  }}
                 >
                   <span className="d-flex flex-row justify-content-start align-items-center">
                     {colDefs[col].name}
@@ -122,13 +155,13 @@ const DataTable = (props) => {
                 colDefs={colDefs}
                 fnNavigation={fnNavigation}
                 fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
-                rowClass={rowClass}
+                fnRowClass={fnRowClass}
                 serverSideEdit={serverSideEdit}
                 primaryKey={primaryKey}
                 removeRow={removeRow}
               />
             ))
-            }
+              }
           </tbody>
         </table>
       </div>
@@ -136,5 +169,4 @@ const DataTable = (props) => {
   }
   return (<div>No data received</div>);
 };
-
 export default React.memo(DataTable);
