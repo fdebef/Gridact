@@ -114,28 +114,27 @@ Function is provided with Object<br>
 `{ operation: 'edit', data: {primary_key: val, column_name: new_value}}` 
 
 #### Objects passed to function are based on operation  ###
-**edit**<br>
-Cell edit<br>
-Passed argument: `{operation: 'new', data: {primary_key: val, column_name: new_value}}`
+**edit**
+Cell edit
+Passed argument: `{operation: 'edit', data: {primary_key: val, column_name: new_value}}`
 Required response: Promise resolved with `{data: updatedRow}` 
 If you want to validate data server-side, you can response with `{error: errorMsg}`, where `errorMsg` is string,
 which will be displayd in small overlay next to edited cell. 
 If `error` is in response, data will not be updated in table, previous value will be restored.   
 
-**new**<br>
-Add new row<br>
+**new**
+Add new row
 Passed argument: `{operation: 'new'}`
 Required response: Promise resolved with `{data: newRow}` In newRow, primary_key must not be `null`.  
 
-**delete**<br>
-Delete row with focus (one cell)<br>
+**delete**
+Delete row with focus (one cell)
 Passed argument: `{operation: 'new', data: {primary_key: val, column_name: new_value}}`
-Required response: `{data: 1}`<br>
+Required response: `{data: 1}`
 If value of `data` key is < 1, row will not be deleted in table.
 
-
 ### showFilter, addRemove, pageSelector, pagingSelector ###
-Type: Boolean <br>
+Type: Boolean
 <optional>Shows/hide filter (search field), add remove row buttons, page selector (what page is displayed), 
 paging selector (page length) 
 
@@ -182,18 +181,22 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
   
 #### name ###
 Type: string **<mandatory>**
+    
 Name of column in table header
   
 ### width ###
 Type: integer <option>
+    
 Set width of current column. Default `<td>` css style is `overflow: hidden`.
 
 ### editable, sortable ###
 Type: Boolean
+
 Column cells will be editable and sortable.
   
 ### hidden ###
 Type: Boolean
+
 Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
 from other columns but the other columns you do not want to show.
   
