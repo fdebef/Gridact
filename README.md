@@ -1,7 +1,7 @@
 <p align="center"><img width="460" src="./img/GridAct.png"></p>
 
-#Gridact
-## Your Excellent React Grid Component
+#Gridact#
+## Your Excellent React Grid Component ##
 
 Gridact is React component for displaying large datasets in table supporting
 
@@ -29,11 +29,11 @@ in JavaScript (Big thanks to _Allan Jardine_)., and that's why I've created Grid
 This is my first public React Component, I'll be really glad for any feedback and I'll do my best 
 to satisfy any of your requests. Thanks.
 
-#Installation
+#Installation #
 Nothing but easy.
 `npm i gridact`
 
-#Basic configuration
+#Basic configuration #
 The basic configuration is pretty simple. Just import Gridact module and pass data and some configuration:
 ```javascript
 import Gridact from 'gridact'
@@ -73,20 +73,20 @@ const App = () => {
       
 ```
 
-##Gridact props
-###data
+##Gridact props ##
+###data ###
 Type: _Array of Objects_ **\<mandatory>**<br>
 ```javascript
 [{col1: val, col2: val,...}, {col1: val, col2: val,...},...] 
 ```
 
-###wrapperDivClass
+###wrapperDivClass ###
 Type: _Array, String_ \<optional><br>
 Props is joined to final classNames `classNames=wrapperDivClass.join(' ')`<br>
 Final table is wrapped in div - main reason was enabling responsiveness in bootstraps, what requires table's outer div.
 For table responsiveness, use at least 'table-responsive col'
 
-###tableClasses
+###tableClasses ###
 Type: _Array | String_ \<optional><br>
 Props is joined to final classNames `classNames=wrapperDivClass.join(' ')`<br>
 Best use with boostrap's table classes. E.g. ```['table', 'table-sm', 'table-striped', 'text-nowrap', 'table-bordered']```
