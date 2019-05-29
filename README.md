@@ -180,7 +180,7 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
 `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
 #### name ###
-Type: string **mandatory**
+Type: string <mandatory><br>
 Name of column in table header
   
 ### width ###
