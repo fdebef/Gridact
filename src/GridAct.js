@@ -374,7 +374,7 @@ const GridAct = (props) => {
                 style={{ width: '200px' }}
                 key="myinputfield"
                 type="text"
-                placeholder={searchPlaceHolder}
+                placeholder={searchPlaceHolder || 'Search...'}
                 value={tableFilterValue}
                 onChange={fnChangeTableFilter}
                 ref={inputFieldRef}

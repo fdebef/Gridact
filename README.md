@@ -81,24 +81,24 @@ Type: _Array of Objects_ **\<mandatory>**<br>
 ```
 
 ### wrapperDivClass ###
-Type: _Array, String_ \<optional><br>
+Type: _Array, String_ _\<option>_<br>
 Props is joined to final classNames `classNames=wrapperDivClass.join(' ')`<br>
 Final table is wrapped in div - main reason was enabling responsiveness in bootstraps, what requires table's outer div.
 For table responsiveness, use at least 'table-responsive col'
 
 ### tableClasses ###
-Type: _Array | String_ \<optional><br>
+Type: _Array | String_ _\<option>_<br>
 Props is joined to final classNames `classNames=wrapperDivClass.join(' ')`<br>
 Best use with boostrap's table classes. E.g. ```['table', 'table-sm', 'table-striped', 'text-nowrap', 'table-bordered']```
 
 ### pagingOptions ###
-Type: _Array_ \<optional><br>
+Type: _Array_ _\<option>_<br>
 Page length options. Will always be sorted numerically, first value will be initials.<br> 
 Example: `[20,10,50,100]` - paging options will be `[10,20,50,100]` - initial set will be `[20]`.
 If undefined, default paging is `[10, 20, 50]`.
 
 ### fnRowClass ###
-Type: _String | Array | function_ \<optional><br>
+Type: _String | Array | function_ _\<option>_<br>
 String or Array of classNames<br>
 If function is provided, it is passed row data. Must return String or Array.
 Used e.g. for coloring whole row based on row data.
@@ -114,40 +114,41 @@ Function is provided with Object<br>
 `{ operation: 'edit', data: {primary_key: val, column_name: new_value}}` 
 
 #### Objects passed to function are based on operation  ###
-**edit**
-Cell edit
-Passed argument: `{operation: 'edit', data: {primary_key: val, column_name: new_value}}`
-Required response: Promise resolved with `{data: updatedRow}` 
+**edit**<br>
+Cell edit<br>
+Passed argument: `{operation: 'edit', data: {primary_key: val, column_name: new_value}}`<br>
+Required response: Promise resolved with `{data: updatedRow}` <br>
 If you want to validate data server-side, you can response with `{error: errorMsg}`, where `errorMsg` is string,
-which will be displayd in small overlay next to edited cell. 
+which will be displayd in small overlay next to edited cell. <br>
 If `error` is in response, data will not be updated in table, previous value will be restored.   
 
-**new**
-Add new row
-Passed argument: `{operation: 'new'}`
+**new**<br>
+Add new row<br>
+Passed argument: `{operation: 'new'}`<br>
 Required response: Promise resolved with `{data: newRow}` In newRow, primary_key must not be `null`.  
 
-**delete**
-Delete row with focus (one cell)
-Passed argument: `{operation: 'new', data: {primary_key: val, column_name: new_value}}`
-Required response: `{data: 1}`
+**delete**<br>
+Delete row with focus (one cell)<br>
+Passed argument: `{operation: 'new', data: {primary_key: val, column_name: new_value}}`<br>
+Required response: `{data: 1}`<br>
 If value of `data` key is < 1, row will not be deleted in table.
 
 ### showFilter, addRemove, pageSelector, pagingSelector ###
-Type: Boolean
-<optional>Shows/hide filter (search field), add remove row buttons, page selector (what page is displayed), 
+Type: _Boolean \<option>_<br>
+Shows/hide filter (search field), add remove row buttons, page selector (what page is displayed), 
 paging selector (page length) 
 
 ### searchPlaceHolder ###
-Type: String
+Type: _String_ _\<option>_<br>
+Default: "Search..."
 
 ### onEnterMoveDown  ###
 Type: Boolean<br>
 If `true`, on `enter` cursor moves down. otherwise moves right.
 
-## colDefs ## **<mandatory>**
-*Columns definitions*
-Type: _Object_
+## colDefs ## 
+*Columns definitions*<br>
+Type: _Object_ **\<mandatory>**<br>
 
 colDefs is object, where keys are column codes, values are column definitions itsels in Object.
 
@@ -172,7 +173,7 @@ colDefs is object, where keys are column codes, values are column definitions it
 ```
 ### Column definition properties ###
 #### cellRender ####
-Type: function | string \<option>
+Type: function | string _\<option>_<br>
 If undefined, the cell is rendered with value provided in data.
 If string is provided, the string is returned.
 Function is passed `cell_value` and `row_data`. This means, you can render the cell based on other values in row.<br>
@@ -184,7 +185,7 @@ Type: string \<mandatory><br>
 Name of column in table header
   
 ### width ###
-Type: integer \<option><br>
+Type: integer _\<option>_<br>
 Set width of current column. Default `<td>` css style is `overflow: hidden`.
 
 ### editable, sortable ###
