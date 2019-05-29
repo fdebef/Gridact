@@ -192,7 +192,7 @@ Type: Boolean
 Column cells will be editable and sortable.
   
 ### hidden ###
-Type: Boolean
+Type: Boolean _\<option>_<br>
 Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
 from other columns but the other columns you do not want to show.
   
