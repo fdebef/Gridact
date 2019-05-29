@@ -1,4 +1,4 @@
-<p align="center"><img width="460" src="./img/GridAct.png"></p>
+<p align="center"><img width="460" src="https://github.com/fdebef/Gridact/blob/master/img/GridAct.png"></p>
 
 # Gridact #
 ## Your Excellent React Grid Component ##
