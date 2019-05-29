@@ -35,7 +35,7 @@ Nothing but easy.
 
 # Basic configuration #
 The basic configuration is pretty simple. Just import Gridact module and pass data and some configuration:
-```javascript
+```
 import Gridact from 'gridact'
 import React from 'react';
 
@@ -76,7 +76,7 @@ const App = () => {
 ## Gridact props ##
 ### data ###
 Type: _Array of Objects_ **\<mandatory>**<br>
-```javascript
+```
 [{col1: val, col2: val,...}, {col1: val, col2: val,...},...] 
 ```
 
@@ -180,7 +180,7 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
 `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
 #### name ###
-Type: string **<mandatory>**
+Type: string **mandatory**
 Name of column in table header
   
 ### width ###
