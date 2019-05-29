@@ -104,14 +104,13 @@ If function is provided, it is passed row data. Must return String or Array.
 Used e.g. for coloring whole row based on row data.
 
 ### primaryKey ###
-Type: String **\<mandatory>**<br>
+Type: String *\<mandatory>*<br>
 Key from colDefs, where data primary key is stored. Is necessary for proper function of component.
 primaryKey must be included in colDefs, but you can hide it (hidden property)
 
 ### serverSideEdit ###
 AcceptedValues: _function_ **\<mandatory> if editable columns** <br>
-Function is provided with Object<br>
-`{ operation: 'edit', data: {primary_key: val, column_name: new_value}}` 
+Function is provided with Object according to selected operation.<br> 
 
 #### Objects passed to function are based on operation  ###
 **edit**<br>
@@ -128,8 +127,8 @@ Passed argument: `{operation: 'new'}`<br>
 Required response: Promise resolved with `{data: newRow}` In newRow, primary_key must not be `null`.  
 
 **delete**<br>
-Delete row with focus (one cell)<br>
-Passed argument: `{operation: 'new', data: {primary_key: val, column_name: new_value}}`<br>
+Delete row, where is focused cell.<br>
+Passed argument: `{operation: 'delete', data: {primary_key: val}}`<br>
 Required response: `{data: 1}`<br>
 If value of `data` key is < 1, row will not be deleted in table.
 
