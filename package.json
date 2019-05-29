@@ -46,6 +46,7 @@
     "grid",
     "inline",
     "edit",
-    "data"
+    "data",
+    "component"
   ]
 }

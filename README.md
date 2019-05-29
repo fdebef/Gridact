@@ -22,16 +22,28 @@ Gridact is React component for displaying large datasets in table supporting
     - custom allowed values and characters
     - error messages
 
+I have done my best to optimize rendering, so the work is for user very good with rendering displayed table
+with 2000 cells (100 rows with 20 columns) in ~200 ms or 10000 cells in ~800 ms. (Change page to page render time.) 
+Render speed is not very much affected with total size of data, but with data displayed. For user experience
+I recommend not to allow page longer then 100 rows with 20 column table.  
+
 Gridact component is result of my experience working with Microsoft Excel as an user and
 [jQuery DataTables](https://datatables.net/) as developer. Datatables taught me to love data 
-in JavaScript (Big thanks to _Allan Jardine_)., and that's why I've created Gridact.
+in JavaScript and that's a big thanks to _Allan Jardine_. This motivated me to create Gridact.
 
 This is my first public React Component, I'll be really glad for any feedback and I'll do my best 
 to satisfy any of your requests. Thanks.
 
 # Installation #
-Nothing but easy.
-`npm i gridact`
+Nothing but easy.<br>
+`npm i gridact`<br>
+Prerequsities:<br>
+```
+react
+react-dom
+mdi-react
+```
+These modules must be installed in parent component.
 
 # Basic configuration #
 The basic configuration is pretty simple. Just import Gridact module and pass data and some configuration:
@@ -75,7 +87,7 @@ const App = () => {
 
 ## Gridact props ##
 ### data ###
-Type: _Array of Objects_ **\<mandatory>**<br>
+Type: _Array of Objects_ **\<mandatory\>**<br>
 ```
 [{col1: val, col2: val,...}, {col1: val, col2: val,...},...] 
 ```
@@ -109,7 +121,7 @@ Key from colDefs, where data primary key is stored. Is necessary for proper func
 primaryKey must be included in colDefs, but you can hide it (hidden property)
 
 ### serverSideEdit ###
-AcceptedValues: _function_ **\<mandatory> if editable columns** <br>
+AcceptedValues: _function_ **\<mandatory\> if editable columns** <br>
 Function is provided with Object according to selected operation.<br> 
 
 #### Objects passed to function are based on operation  ###
@@ -180,7 +192,7 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
 `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
 #### name ###
-Type: string \<mandatory><br>
+Type: string **\<mandatory\>**<br>
 Name of column in table header
   
 ### width ###
@@ -200,7 +212,7 @@ _As the inline edit is build upon contentEditable, I paid a lot of attention to 
 There two filter options for values users can write to cell._  
  
 ### filterEditChar ###
-Type: RegExp | function <optional>
+Type: _RegExp | function_ _\<optional\>_<br>
 This option is applied directly onKeyPress event - it does not let user write the characters you specify.
 If RegExp is provided, it is passed to `character_typed.match()`.
 Function is passed three arguments: `(character_typed, cell_value_before_edit, row_data)` Must return `true` or `false`.
@@ -210,16 +222,20 @@ True = character is allowed, false = disallowed.
 Allowed are only alphanumeric characters included Czech ones.
   
 ### filterEditValue ###
+Type: _RegExp | function_ _\<optional\>_<br>
 Because above mentioned option does not block pasting from clipboard, and I didn't want to forbid it generally, 
 we have to check the final value user sends to your serverSideEdit function and which will be displayed in table.
 As this is potential XSS risc, pay close attention to this function.
 Function is passed three arguments: `(new_cell_value, cell_value_before_edit, row_data)` Must return sanitized string.
 *Default value* is
-`(newValue, cellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, ''))`
-  
+`(newValue, cellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, ''))`<br>
+If RegExp is provided, it is passed to `newValue.replace(RegExp, '')`
+
 ## Styling
-You can find basic stylesheet in src on GitHub, you can simply change it on your own.
+You can find basic stylesheet in src on GitHub, you can simply overwrite it on your own.
 For best results I do recommend using Bootstrap ^4.3 and styling table, rows and cells with bootstrap classes.
+Currently it is not possible to change icons, surely will be in future version. **mdi-react** must be installed
+to icons working properly.
  
 # Further development
 I'll be glad if you leave me a message. What you miss, what you want, what you like.
