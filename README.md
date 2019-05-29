@@ -104,7 +104,7 @@ If function is provided, it is passed row data. Must return String or Array.
 Used e.g. for coloring whole row based on row data.
 
 ### primaryKey ###
-Type: String *\<mandatory>*<br>
+Type: String **\<mandatory\>**<br>
 Key from colDefs, where data primary key is stored. Is necessary for proper function of component.
 primaryKey must be included in colDefs, but you can hide it (hidden property)
 
