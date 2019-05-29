@@ -31,8 +31,8 @@ Gridact component is result of my experience working with Microsoft Excel as an 
 [jQuery DataTables](https://datatables.net/) as developer. Datatables taught me to love data 
 in JavaScript and that's a big thanks to _Allan Jardine_. This motivated me to create Gridact.
 
-This is my first public React Component, I'll be really glad for any feedback and I'll do my best 
-to satisfy any of your requests. Thanks.
+**This is my first public React Component, I'll be really glad for any feedback and I'll do my best 
+to satisfy any of your requests. Thanks.**
 
 # Installation #
 Nothing but easy.<br>
