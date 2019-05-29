@@ -42,8 +42,9 @@ Prerequsities:<br>
 react
 react-dom
 mdi-react
+bootstrap
 ```
-These modules must be installed in parent component.
+These modules must be installed in parent component. Bootstrap must be imported in whichever parent component.
 
 # Basic configuration #
 The basic configuration is pretty simple. Just import Gridact module and pass data and some configuration:
