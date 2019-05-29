@@ -31,7 +31,6 @@ const MyReactRow = (props) => {
     rowData.current.bfrChange = `${x.getSeconds()}.${x.getMilliseconds()}`;
     rowForceUpdate(p => p + 1);
   };
-
   // --------------------------------------------------------------------------
   // Calculate rowClassNames, based on rowClass parameter
   // tightly controlled on data types
