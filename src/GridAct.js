@@ -12,14 +12,10 @@ import FileDocumentBoxesOutlineIcon from 'mdi-react/FileDocumentBoxesOutlineIcon
 import './styling.css';
 import DataTable from './DataTable';
 
-
 { /* eslint-disable max-len */
 }
-let i = 0;
-
 
 const GridAct = (props) => {
-  i++;
   const {
     data, colDefs, tableClasses, pagingOptions, fnRowClass, serverSideEdit, primaryKey, wrapperDivClass,
     showFilter, addRemove, pageSelector, pagingSelector, searchPlaceHolder, onEnterMoveDown
@@ -259,6 +255,9 @@ const GridAct = (props) => {
         setPageData(pageData.current.slice(0, pageLength));
         activeCell.current = [0, 0];
         forceRender(p => p + 1);
+      })
+      .catch((err) => {
+        throw Error(err);
       });
   };
 
@@ -301,6 +300,9 @@ const GridAct = (props) => {
         } else {
           console.log('ERROR ON DATA DELETE: ', res.error);
         }
+      })
+      .catch((err) => {
+        throw Error(err);
       });
   };
 
@@ -323,8 +325,6 @@ const GridAct = (props) => {
     </>
   );
 
-  console.log('-----------tableData', tableData.current.length, pageLength);
-
   const PageSelector = () => (
     <div className="d-flex flex-row align-items-center justify-content-center">
       <button key="1" type="button" className="forward" onClick={() => changePage('first')}>
@@ -343,7 +343,6 @@ const GridAct = (props) => {
         {Math.ceil(tableData.current.length / pageLength)}
       </button>
       <span className="text-success">{` (${tableData.current.length})`}</span>
-
     </div>
   );
 
@@ -359,11 +358,11 @@ const GridAct = (props) => {
   );
 
   return (
-    <div className="container">
+    <div className="container-fluid">
       <div className="row">
-        <div className="col-xl-4 d-flex flex-flow-row d-flex- flex-row
+        <div className="col-lg-4 d-flex flex-flow-row d-flex- flex-row
         justify-content-center
-        justify-content-xl-start
+        justify-content-lg-start
         align-items-center"
         >
           {showFilter && (
@@ -374,7 +373,7 @@ const GridAct = (props) => {
                 style={{ width: '200px' }}
                 key="myinputfield"
                 type="text"
-                placeholder={searchPlaceHolder || 'Search...'}
+                placeholder={searchPlaceHolder}
                 value={tableFilterValue}
                 onChange={fnChangeTableFilter}
                 ref={inputFieldRef}
@@ -383,16 +382,16 @@ const GridAct = (props) => {
           )
           }
         </div>
-        <div className="col-xl-4 d-flex flex-row mt-3 mt-xl-0
+        <div className="col-lg-4 d-flex flex-row mt-3 mt-lg-0
         align-items-center
         justify-content-center"
         >
           {addRemove && <AddRemoveButtons addRemove={addRemove} />}
         </div>
-        <div className="col-xl-4 mt-3 mt-xl-0 d-flex flex-row
+        <div className="col-lg-4 mt-3 mt-lg-0 d-flex flex-row
         align-items-center
         justify-content-center
-        justify-content-xl-end"
+        justify-content-lg-end"
         >
           {pagingSelector && <PagingSelector key="10" />}
           {pageSelector && <PageSelector key="11" />}
