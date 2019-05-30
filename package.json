@@ -1,7 +1,7 @@
 {
   "name": "gridact",
-  "version": "0.4.0",
-  "description": "Your Excellent React Grid Component",
+  "version": "0.4.1",
+  "description": "Updated readme.md",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
