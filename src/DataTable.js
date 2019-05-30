@@ -167,6 +167,6 @@ const DataTable = (props) => {
       </div>
     );
   }
-  return (<div>No data received</div>);
+  return (<div className="d-flex flex-column justify-content-center align-items-center">No data received</div>);
 };
 export default React.memo(DataTable);

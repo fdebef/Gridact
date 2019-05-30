@@ -22,6 +22,8 @@ Gridact is React component for displaying large datasets in table supporting
     - custom allowed values and characters
     - error messages
 
+**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
+
 I have done my best to optimize rendering, so the work is for user very good with rendering displayed table
 with 2000 cells (100 rows with 20 columns) in ~200 ms or 10000 cells in ~800 ms. (Change page to page render time.) 
 Render speed is not very much affected with total size of data, but with data displayed. For user experience
@@ -46,9 +48,11 @@ bootstrap
 ```
 These modules must be installed in parent component. Bootstrap must be imported in whichever parent component.
 
+**For proper function of error messages, append** `<div id="modalEl"></div>` to your `body` of `index.html`.  
+
 # Basic configuration #
 The basic configuration is pretty simple. Just import Gridact module and pass data and some configuration:
-```
+```javascript
 import Gridact from 'gridact'
 import React from 'react';
 
@@ -89,7 +93,7 @@ const App = () => {
 ## Gridact props ##
 ### data ###
 Type: _Array of Objects_ **\<mandatory\>**<br>
-```
+```javascript
 [{col1: val, col2: val,...}, {col1: val, col2: val,...},...] 
 ```
 
@@ -164,7 +168,7 @@ Type: _Object_ **\<mandatory>**<br>
 
 colDefs is object, where keys are column codes, values are column definitions itsels in Object.
 
-```
+```javascript
 {line_id: {
     cellRender: v => v,
     name: 'ID',
@@ -208,6 +212,20 @@ Column cells will be editable and sortable.
 Type: Boolean _\<option>_<br>
 Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
 from other columns but the other columns you do not want to show.
+
+### cellClass ###
+Type: _String | Array | function_ _\<option>_<br>
+Class used for every cell in this column.<br>
+String or Array of classNames<br>
+If function is provided, it is passed `(cellValue, rowData)`. Must return String or Array. 
+Used e.g. for coloring whole column based on data of given cell or other cells in row.
+
+### thClass ###
+Type: _String | Array | function_ _\<option>_<br>
+Class used for every cell in this column.<br>
+String or Array of classNames<br>
+If function is provided, it is passed `(cellValue, rowData)`. Must return String or Array. 
+Used e.g. for coloring whole column based on data of given cell or other cells in row.
   
 _As the inline edit is build upon contentEditable, I paid a lot of attention to sanitize input text to avoid XSS. 
 There two filter options for values users can write to cell._  
