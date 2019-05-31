@@ -44,7 +44,6 @@ const GridAct = (props) => {
 
   const fnGetActiveCell = () => activeCell.current;
   const fnSetActiveCell = (newActiveCell) => {
-    console.log('CELL STATE CHANGED', newActiveCell);
     activeCell.current = newActiveCell;
   };
 
@@ -59,7 +58,6 @@ const GridAct = (props) => {
   });
   const fnGetRefStore = () => refStore.current;
   const fnGetRef = (x, y) => {
-    console.log(x, y, refStore.current);
     return refStore.current[`${String(x)}-${String(y)}`].current;
   };
 
@@ -76,7 +74,6 @@ const GridAct = (props) => {
   }, [data]);
 
   useEffect(() => {
-    console.log('THIS IS ACTIVE CELL NOW!', fnGetActiveCell());
     if (fnGetActiveCell()[0] >= 0 && fnGetActiveCell()[1] >= 0 && fnGetActiveCell()[1] > pageData.length - 1) {
       activeCell.current = [activeCell.current[0], pageData.length - 1];
       fnGetRef(activeCell.current[0], activeCell.current[1]).focus();
@@ -108,7 +105,6 @@ const GridAct = (props) => {
       default:
         newPage = 1;
     }
-    console.log('NEW PAGE = ', newPage, 'pageData: ', tableData);
     // const startIndex = (newPage - 1) * pageLength;
     // const endIndex = newPage * pageLength;
     // pageData = tableData.current.slice(startIndex, endIndex); // calculate pageData
@@ -224,9 +220,25 @@ const GridAct = (props) => {
   const addRow = () => {
     tableData.current = data2.current;
     serverSideEdit({ operation: 'new' })
-      .then((n) => {
-        const nR = JSON.parse(n).data;
-        data2.current.unshift(nR);
+      .then((rs) => {
+        let parsedRes;
+        if (typeof rs === 'string') {
+          try {
+            // try to parse as JSON
+            parsedRes = JSON.parse(rs);
+          } catch (e) {
+            throw Error(`Not a JSON string ${JSON.stringify(e)}`);
+          }
+        } else if (typeof rs === 'object') {
+          try {
+            // try to parse as JSON
+            parsedRes = JSON.parse(JSON.stringify(rs));
+          } catch (e) {
+            throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
+          }
+        } else throw Error('Not a valid JSON string nor JSON object');
+
+        data2.current.unshift(parsedRes.data);
         tableData.current = data2.current.slice();
         // pageData.current.unshift(nR);
         activeCell.current = [0, 0];
@@ -245,10 +257,26 @@ const GridAct = (props) => {
     const delData = {};
     delData[primaryKey] = pageData[fnGetActiveCell()[1]][primaryKey];
     serverSideEdit({ operation: 'delete', data: delData })
-      .then((res) => {
-        if (!res.error) {
-          if (JSON.parse(res).data > 0) {
-            // Modify data2 - remove deletedRow
+      .then((rs) => {
+        let parsedRes;
+        if (typeof rs === 'string') {
+          try {
+          // try to parse as JSON
+            parsedRes = JSON.parse(rs);
+          } catch (e) {
+            throw Error(`Not a JSON string ${JSON.stringify(e)}`);
+          }
+        } else if (typeof rs === 'object') {
+          try {
+          // try to parse as JSON
+            parsedRes = JSON.parse(JSON.stringify(rs));
+          } catch (e) {
+            throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
+          }
+        } else throw Error('Not a valid JSON string nor JSON object');
+        if (!parsedRes.error) {
+          if (parsedRes.data > 0) {
+          // Modify data2 - remove deletedRow
             const idxOfDeletedRow = data2.current
               .map(rw => rw[primaryKey])
               .indexOf(delData[primaryKey]);
@@ -260,23 +288,22 @@ const GridAct = (props) => {
             tableData.current.splice(idxOfDeletedRowTableData, 1);
             // calculate new pageActual - you can delete last item on page
             if (Math.ceil(data2.current.length / pageLength) < pageActual) {
-              // last item of last page was deleted => totalPages < pageActual
-              // we have to set last page of new dataSet (shorter of delete line)
+            // last item of last page was deleted => totalPages < pageActual
+            // we have to set last page of new dataSet (shorter of delete line)
               const allPages = Math.ceil(tableData.current.length / pageLength);
               // setPageData(tableData.current.slice((allPages - 1) * pageLength, allPages * pageLength));
               // set new position for cursor focus
               activeCell.current = [activeCell.current[0], pageLength - 1];
-              console.log('ACTIVE CELL in fnRemove: ', activeCell, allPages);
               setPageActual(allPages);
             } else {
-              // setPageData(tableData.current.slice((pageActual - 1) * pageLength, pageActual * pageLength));
+            // setPageData(tableData.current.slice((pageActual - 1) * pageLength, pageActual * pageLength));
               forceRender(p => p + 1);
             }
           } else {
             console.log('NO ROW REMOVED');
           }
         } else {
-          console.log('ERROR ON DATA DELETE: ', res.error);
+          console.log('ERROR ON DATA DELETE: ', parsedRes.error);
         }
       })
       .catch((err) => {
@@ -334,8 +361,6 @@ const GridAct = (props) => {
       </button>
     </div>
   );
-
-  console.log('THIS IS PAGE DATA: ', pageData);
 
   return (
     <div className="container-fluid">
