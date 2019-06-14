@@ -3,6 +3,7 @@ import UnfoldMoreHorizontalIcon from 'mdi-react/UnfoldMoreHorizontalIcon';
 import ChevronUpIcon from 'mdi-react/ChevronUpIcon';
 import ChevronDownIcon from 'mdi-react/ChevronDownIcon';
 import MyReactRow from './MyReactRow';
+import TableHead from './TableHead';
 
 /* eslint-disable react/prop-types */
 
@@ -10,7 +11,8 @@ const DataTable = (props) => {
   const {
     data, colDefs, tableClasses, sortTable, sortState, fnGetActiveCell, fnSetActiveCell,
     fnUpdateDataOnEditWithoutRender, fnRowClass, serverSideEdit, primaryKey,
-    fnUpdateRefStore, fnGetRefStore, removeRow, wrapperDivClass, onEnterMoveDown
+    fnUpdateRefStore, fnGetRefStore, removeRow, wrapperDivClass, onEnterMoveDown,
+    tableCellClass
   } = props;
 
   // --------------------------------------------------------------------------
@@ -69,20 +71,6 @@ const DataTable = (props) => {
     fnGetRefStore()[`${String(calcX)}-${String(calcY)}`].current.focus();
   };
 
-  const SortArrows = (props) => {
-    const { col } = props;
-    if (colDefs[col].sortable) {
-      switch (true) {
-        case (sortState.col === col && sortState.dir === 'asc'):
-          return (<span className="ml-auto"><ChevronUpIcon size="1em" /></span>);
-        case (sortState.col === col && sortState.dir === 'desc'):
-          return (<span className="ml-auto"><ChevronDownIcon size="1em" /></span>);
-        default:
-          return (<span className="ml-auto"><UnfoldMoreHorizontalIcon size="0.8em" /></span>);
-      }
-    }
-    return null;
-  };
 
   const wrpClass = (wrpProp) => {
     switch (Object.prototype.toString.call(wrpProp)) {
@@ -116,6 +104,7 @@ const DataTable = (props) => {
     }
   };
 
+
   if (data.length) {
     return (
       <div className={wrpClass(wrapperDivClass)}>
@@ -123,26 +112,14 @@ const DataTable = (props) => {
           role="grid"
           className={tblClass(tableClasses)}
         >
-          <thead>
-            <tr>
-              {Object.keys(colDefs).filter(cD => !colDefs[cD].hidden).map(col => (
-                <td
-                  className={colDefs[col].thClass}
-                  key={col}
-                  role="gridcell"
-                  style={{ ...widthStyle(colDefs[col].width), cursor: 'pointer' }}
-                  onClick={() => {
-                    sortTable(col);
-                  }}
-                >
-                  <span className="d-flex flex-row justify-content-start align-items-center">
-                    {colDefs[col].name}
-                    <SortArrows col={col} />
-                  </span>
-                </td>
-              ))}
-            </tr>
-          </thead>
+
+          <TableHead
+            colDefs={colDefs}
+            widthStyle={widthStyle}
+            tableCellClass={tableCellClass}
+            sortTable={sortTable}
+            sortState={sortState}
+          />
           <tbody>
             {data.map((row, y) => (
               <MyReactRow
@@ -159,6 +136,7 @@ const DataTable = (props) => {
                 serverSideEdit={serverSideEdit}
                 primaryKey={primaryKey}
                 removeRow={removeRow}
+                tableCellClass={tableCellClass}
               />
             ))
               }

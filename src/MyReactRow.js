@@ -1,36 +1,40 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MyReactCell from './MyReactCell';
 
 /* eslint-disable react/prop-types */
 
 const MyReactRow = (props) => {
   const {
-    row, y, colRowsCount, fnUpdateRefStore,
+    row, y, fnUpdateRefStore,
     fnSetActiveCell, colDefs, fnNavigation,
     fnUpdateDataOnEditWithoutRender, fnRowClass,
-    serverSideEdit, primaryKey, removeRow
+    serverSideEdit, primaryKey, removeRow, tableCellClass
   } = props;
 
-  const rowData = useRef({ rowData: {}, newRowBuffer: false, bfrChange: undefined });
-  const [fupd, rowForceUpdate] = useState(0);
+  const [rowData, setRowData] = useState({});
+  // const [fupd, rowForceUpdate] = useState(0);
 
-  if (!rowData.current.newRowBuffer) {
-    // update rowData with row prop only if there is no buffered data from newRow
-    rowData.current.rowData = row;
-  }
+  useEffect(() => {
+    setRowData(row);
+  }, [row]);
 
-  rowData.current.newRowBuffer = false; // clear buffer indicator for next render
-  const x = new Date();
-  rowData.current.bfrChange = `${x.getSeconds()}.${x.getMilliseconds()}`;
+  // if (!rowData.current.newRowBuffer) {
+  //   // update rowData with row prop only if there is no buffered data from newRow
+  //   rowData.current.rowData = row;
+  // }
 
-  const fnUpdateRowData = (newRowData) => {
-    rowData.current.rowData = newRowData;
-    // assign buffer value, so in next render it is not overwritten
-    rowData.current.newRowBuffer = true;
-    const x = new Date();
-    rowData.current.bfrChange = `${x.getSeconds()}.${x.getMilliseconds()}`;
-    rowForceUpdate(p => p + 1);
-  };
+  // rowData.current.newRowBuffer = false; // clear buffer indicator for next render
+
+
+  // const fnUpdateRowData = (newRowData) => {
+  //   rowData.current.rowData = newRowData;
+  //   // assign buffer value, so in next render it is not overwritten
+  //   rowData.current.newRowBuffer = true;
+  //   const x = new Date();
+  //   rowData.current.bfrChange = `${x.getSeconds()}.${x.getMilliseconds()}`;
+  //   console.log('ROWDATA: ', console.log(rowData.current))
+  //   rowForceUpdate(p => p + 1);
+  // };
 
   // --------------------------------------------------------------------------
   // Calculate rowClassNames, based on rowClass parameter
@@ -49,7 +53,7 @@ const MyReactRow = (props) => {
   };
 
   return (
-    <tr className={rowClassNames(rowData.current.rowData)} key={y}>
+    <tr className={rowClassNames(rowData)} key={y}>
       {Object.keys(colDefs).filter(cD => !colDefs[cD].hidden).map((col, x) => (
         <MyReactCell
           role="gridcell"
@@ -57,23 +61,22 @@ const MyReactRow = (props) => {
           col={col}
           x={x}
           y={y}
-          cellValue={rowData.current.rowData[col]}
-          colRowsCount={colRowsCount}
+          cellValue={rowData[col]}
           fnUpdateRefStore={fnUpdateRefStore}
           fnSetActiveCell={fnSetActiveCell}
           colDefs={colDefs}
           fnNavigation={fnNavigation}
-          row={rowData.current.rowData}
+          row={rowData}
           fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
-          fnUpdateRowData={fnUpdateRowData}
+          setRowData={setRowData}
           serverSideEdit={serverSideEdit}
           primaryKey={primaryKey}
           removeRow={removeRow}
-          rowForceUpdate={rowForceUpdate}
+          tableCellClass={tableCellClass}
         />
       ))
         }
     </tr>
   );
 };
-export default MyReactRow;
+export default React.memo(MyReactRow);
