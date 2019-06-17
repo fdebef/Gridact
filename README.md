@@ -22,7 +22,14 @@ Gridact is React component for displaying large datasets in table supporting
     - custom allowed values and characters
     - error messages
 
-**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
+##**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
+
+##Changelog 0.7.0
+- **Renamed name of columns from name to tableHead in colDefs**<br>
+- Removed Bootstrap in whole app, now you can fully customize by CSS
+- Optimization of rendering
+ 
+## GridAct
 
 I have done my best to optimize rendering, so the work is for user very good with rendering displayed table
 with 2000 cells (100 rows with 20 columns) in ~200 ms or 10000 cells in ~800 ms. (Change page to page render time.) 
@@ -44,9 +51,9 @@ Prerequsities:<br>
 react
 react-dom
 mdi-react
-bootstrap
 ```
-These modules must be installed in parent component. Bootstrap must be imported in whichever parent component.
+These modules must be installed in parent component. Bootstrap must be imported in whichever parent component.<br>
+~~bootstrap~~ removed in version 0.6.0
 
 **For proper function of error messages, append** `<div id="modalEl"></div>` to your `body` of `index.html`.  
 
@@ -90,6 +97,9 @@ const App = () => {
       
 ```
 
+## Styling
+You can fully style with own classes. See custom `styles.css`. GridAct is built on CSS grid. 
+
 ## Gridact props ##
 ### data ###
 Type: _Array of Objects_ **\<mandatory\>**<br>
@@ -108,6 +118,11 @@ Type: _Array | String_ _\<option>_<br>
 Props is joined to final classNames `classNames=wrapperDivClass.join(' ')`<br>
 Best use with boostrap's table classes. E.g. ```['table', 'table-sm', 'table-striped', 'text-nowrap', 'table-bordered']```
 
+###tableCellClass ###
+Type: _String_ _\<option>_<br>
+Easy cell styling, changes style of `th` and `td` cells in table.
+ 
+
 ### pagingOptions ###
 Type: _Array_ _\<option>_<br>
 Page length options. Will always be sorted numerically, first value will be initials.<br> 
@@ -119,6 +134,18 @@ Type: _String | Array | function_ _\<option>_<br>
 String or Array of classNames<br>
 If function is provided, it is passed row data. Must return String or Array.
 Used e.g. for coloring whole row based on row data.
+
+### fnRowClass ###
+Type: _String | Array | function_ _\<option>_<br>
+String or Array of classNames<br>
+If function is provided, it is passed row data. Must return String or Array.
+Used e.g. for coloring whole row based on row data.
+
+### fnCellClass ###
+Type: _String | Array | function_ _\<option>_<br>
+String or Array of classNames<br>
+If function is provided, it is passed row data. Must return String or Array.
+Used e.g. for coloring cells based on row data.
 
 ### primaryKey ###
 Type: String **\<mandatory\>**<br>
@@ -196,7 +223,7 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
 *Example:*
 `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
-#### name ###
+#### tableHead (!changed in version 0.6.0 - previously "name") 
 Type: string **\<mandatory\>**<br>
 Name of column in table header
   

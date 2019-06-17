@@ -1,40 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import MyReactCell from './MyReactCell';
+import propsAreEqual from './propsAreEqual';
 
 /* eslint-disable react/prop-types */
 
 const MyReactRow = (props) => {
   const {
-    row, y, fnUpdateRefStore,
-    fnSetActiveCell, colDefs, fnNavigation,
-    fnUpdateDataOnEditWithoutRender, fnRowClass,
-    serverSideEdit, primaryKey, removeRow, tableCellClass
+    row,
+    y,
+    fnUpdateRefStore,
+    fnSetActiveCell,
+    colDefs,
+    fnNavigation,
+    fnUpdateDataOnEditWithoutRender,
+    fnRowClass,
+    serverSideEdit,
+    primaryKey,
+    removeRow,
+    tableCellClass,
+    setPageData
   } = props;
-
-  const [rowData, setRowData] = useState({});
-  // const [fupd, rowForceUpdate] = useState(0);
-
-  useEffect(() => {
-    setRowData(row);
-  }, [row]);
-
-  // if (!rowData.current.newRowBuffer) {
-  //   // update rowData with row prop only if there is no buffered data from newRow
-  //   rowData.current.rowData = row;
-  // }
-
-  // rowData.current.newRowBuffer = false; // clear buffer indicator for next render
-
-
-  // const fnUpdateRowData = (newRowData) => {
-  //   rowData.current.rowData = newRowData;
-  //   // assign buffer value, so in next render it is not overwritten
-  //   rowData.current.newRowBuffer = true;
-  //   const x = new Date();
-  //   rowData.current.bfrChange = `${x.getSeconds()}.${x.getMilliseconds()}`;
-  //   console.log('ROWDATA: ', console.log(rowData.current))
-  //   rowForceUpdate(p => p + 1);
-  // };
 
   // --------------------------------------------------------------------------
   // Calculate rowClassNames, based on rowClass parameter
@@ -53,30 +38,32 @@ const MyReactRow = (props) => {
   };
 
   return (
-    <tr className={rowClassNames(rowData)} key={y}>
-      {Object.keys(colDefs).filter(cD => !colDefs[cD].hidden).map((col, x) => (
-        <MyReactCell
-          role="gridcell"
-          key={String(x) + String(y)}
-          col={col}
-          x={x}
-          y={y}
-          cellValue={rowData[col]}
-          fnUpdateRefStore={fnUpdateRefStore}
-          fnSetActiveCell={fnSetActiveCell}
-          colDefs={colDefs}
-          fnNavigation={fnNavigation}
-          row={rowData}
-          fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
-          setRowData={setRowData}
-          serverSideEdit={serverSideEdit}
-          primaryKey={primaryKey}
-          removeRow={removeRow}
-          tableCellClass={tableCellClass}
-        />
-      ))
-        }
+    <tr className={rowClassNames(row)} key={y}>
+      {Object.keys(colDefs)
+        .filter(cD => !colDefs[cD].hidden && colDefs[cD].tableHead)
+        .map((col, x) => (
+          <MyReactCell
+            role="gridcell"
+            key={String(x) + String(y)}
+            col={col}
+            x={x}
+            y={y}
+            cellValue={row[col]}
+            fnUpdateRefStore={fnUpdateRefStore}
+            fnSetActiveCell={fnSetActiveCell}
+            colDefs={colDefs}
+            fnNavigation={fnNavigation}
+            row={row}
+            fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
+            setPageData={setPageData}
+            serverSideEdit={serverSideEdit}
+            primaryKey={primaryKey}
+            removeRow={removeRow}
+            tableCellClass={tableCellClass}
+          />
+        ))}
     </tr>
   );
 };
-export default React.memo(MyReactRow);
+
+export default React.memo(MyReactRow, propsAreEqual);

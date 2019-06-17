@@ -9,10 +9,24 @@ import TableHead from './TableHead';
 
 const DataTable = (props) => {
   const {
-    data, colDefs, tableClasses, sortTable, sortState, fnGetActiveCell, fnSetActiveCell,
-    fnUpdateDataOnEditWithoutRender, fnRowClass, serverSideEdit, primaryKey,
-    fnUpdateRefStore, fnGetRefStore, removeRow, wrapperDivClass, onEnterMoveDown,
-    tableCellClass
+    pageData,
+    colDefs,
+    tableClasses,
+    sortTable,
+    sortState,
+    fnGetActiveCell,
+    fnSetActiveCell,
+    fnUpdateDataOnEditWithoutRender,
+    fnRowClass,
+    serverSideEdit,
+    primaryKey,
+    fnUpdateRefStore,
+    fnGetRefStore,
+    removeRow,
+    wrapperDivClass,
+    onEnterMoveDown,
+    tableCellClass,
+    setPageData,
   } = props;
 
   // --------------------------------------------------------------------------
@@ -23,8 +37,11 @@ const DataTable = (props) => {
   // --------------------------------------------------------------------------
   // number of cols and rows for navigation (not to go outside table
   let colRowsCount;
-  if (data.length) {
-    colRowsCount = [Object.keys(colDefs).filter(k => !k.hidden).length, data.length];
+  if (pageData.length) {
+    colRowsCount = [
+      Object.keys(colDefs).filter(k => !k.hidden).length,
+      pageData.length
+    ];
   }
 
   // --------------------------------------------------------------------------
@@ -34,7 +51,7 @@ const DataTable = (props) => {
     let [calcX, calcY] = fnGetActiveCell();
     const [xCount, yCount] = colRowsCount; // number of columns and rows
     if (keyCode === 913) {
-      (onEnterMoveDown) ? keyCode = 40 : keyCode = 39;
+      onEnterMoveDown ? (keyCode = 40) : (keyCode = 39);
     }
     switch (keyCode) {
       case 38: // up
@@ -71,7 +88,6 @@ const DataTable = (props) => {
     fnGetRefStore()[`${String(calcX)}-${String(calcY)}`].current.focus();
   };
 
-
   const wrpClass = (wrpProp) => {
     switch (Object.prototype.toString.call(wrpProp)) {
       case '[object Array]':
@@ -100,19 +116,14 @@ const DataTable = (props) => {
 
   const widthStyle = (width) => {
     if (width) {
-      return ({ width });
+      return { width };
     }
   };
 
-
-  if (data.length) {
+  if (pageData.length) {
     return (
       <div className={wrpClass(wrapperDivClass)}>
-        <table
-          role="grid"
-          className={tblClass(tableClasses)}
-        >
-
+        <table role="grid" className={tblClass(tableClasses)} style={{ cursor: 'default' }}>
           <TableHead
             colDefs={colDefs}
             widthStyle={widthStyle}
@@ -121,30 +132,31 @@ const DataTable = (props) => {
             sortState={sortState}
           />
           <tbody>
-            {data.map((row, y) => (
+            {pageData.map((row, y) => (
               <MyReactRow
                 key={y}
                 row={row}
                 y={y}
-                colRowsCount={[Object.keys(data[0]).length, data.length]}
                 fnUpdateRefStore={fnUpdateRefStore}
                 fnSetActiveCell={fnSetActiveCell}
                 colDefs={colDefs}
                 fnNavigation={fnNavigation}
-                fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
+                setPageData={setPageData}
                 fnRowClass={fnRowClass}
                 serverSideEdit={serverSideEdit}
                 primaryKey={primaryKey}
                 removeRow={removeRow}
                 tableCellClass={tableCellClass}
+                fnUpdateDataOnEditWithoutRender={
+                  fnUpdateDataOnEditWithoutRender
+                }
               />
-            ))
-              }
+            ))}
           </tbody>
         </table>
       </div>
     );
   }
-  return (<div className="d-flex flex-column justify-content-center align-items-center">No data received</div>);
+  return <div className="display-inline align-center">No data received</div>;
 };
 export default React.memo(DataTable);

@@ -1,6 +1,4 @@
-import React, {
-  useState, useRef, useEffect
-} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ChevronLeftIcon from 'mdi-react/ChevronLeftIcon';
 import ChevronDoubleLeftIcon from 'mdi-react/ChevronDoubleLeftIcon';
 import ChevronDoubleRightIcon from 'mdi-react/ChevronDoubleRightIcon';
@@ -9,7 +7,6 @@ import TableSearchIcon from 'mdi-react/TableSearchIcon';
 import TableRowAddBeforeIcon from 'mdi-react/TableRowAddBeforeIcon';
 import TableRowRemoveIcon from 'mdi-react/TableRowRemoveIcon';
 import FileDocumentBoxesOutlineIcon from 'mdi-react/FileDocumentBoxesOutlineIcon';
-import './styling.css';
 import DataTable from './DataTable';
 
 //-----------------------------------------------------
@@ -19,7 +16,9 @@ const PagingSelector = (props) => {
   const { pageLength, changePageLength, pagingOptions } = props;
   return (
     <>
-      <span key="17" className="FFInputDesc"><FileDocumentBoxesOutlineIcon /></span>
+      <span key="17" className="FFInputDesc">
+        <FileDocumentBoxesOutlineIcon />
+      </span>
 
       <select
         className="FFInputField paging-font"
@@ -27,8 +26,13 @@ const PagingSelector = (props) => {
         value={pageLength}
         onChange={changePageLength}
       >
-        {pagingOptions.sort((a, b) => (a - b))
-          .map(opt => (<option key={opt} value={opt}>{opt}</option>))}
+        {pagingOptions
+          .sort((a, b) => a - b)
+          .map(opt => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
       </select>
     </>
   );
@@ -40,18 +44,40 @@ const PageSelector = (props) => {
   } = props;
   return (
     <div key="18" className="display-inline align-right">
-      <button key="1" type="button" className="forward paging-font" onClick={() => changePage('first')}>
+      <button
+        key="1"
+        type="button"
+        className="forward paging-font"
+        onClick={() => changePage('first')}
+      >
         {1}
         <ChevronDoubleLeftIcon key="2" />
       </button>
-      <button key="3" type="button" className="forward paging-font" onClick={() => changePage('-1')}>
+      <button
+        key="3"
+        type="button"
+        className="forward paging-font"
+        onClick={() => changePage('-1')}
+      >
         <ChevronLeftIcon key="4" />
       </button>
-      <span key="5" className="paging-font">{pageActual}</span>
-      <button key="6" type="button" className="forward paging-font" onClick={() => changePage('+1')}>
+      <span key="5" className="paging-font">
+        {pageActual}
+      </span>
+      <button
+        key="6"
+        type="button"
+        className="forward paging-font"
+        onClick={() => changePage('+1')}
+      >
         <ChevronRightIcon key="7" />
       </button>
-      <button key="8" type="button" className="forward paging-font" onClick={() => changePage('last')}>
+      <button
+        key="8"
+        type="button"
+        className="forward paging-font"
+        onClick={() => changePage('last')}
+      >
         <ChevronDoubleRightIcon key="9" />
         {Math.ceil(tableDataLength / pageLength)}
       </button>
@@ -64,10 +90,22 @@ const AddRemoveButtons = (props) => {
   const { addRow, removeRow } = props;
   return (
     <div key="19" className="display-inline align-center">
-      <button key="20" type="button" title="Add new row..." onClick={addRow} className="add">
+      <button
+        key="20"
+        type="button"
+        title="Add new row..."
+        onClick={addRow}
+        className="add"
+      >
         <TableRowAddBeforeIcon />
       </button>
-      <button key="21" type="button" title="Remove row with cursor..." onClick={removeRow} className="ml-2 remove">
+      <button
+        key="21"
+        type="button"
+        title="Remove row with cursor..."
+        onClick={removeRow}
+        className="ml-2 remove"
+      >
         <TableRowRemoveIcon />
       </button>
     </div>
@@ -79,16 +117,28 @@ const AddRemoveButtons = (props) => {
 
 const GridAct = (props) => {
   const {
-    data, colDefs, tableClasses, pagingOptions, fnRowClass, serverSideEdit, primaryKey, wrapperDivClass,
-    showFilter, addRemove, pageSelector, pagingSelector, searchPlaceHolder, onEnterMoveDown,
+    data,
+    colDefs,
+    tableClasses,
+    pagingOptions,
+    fnRowClass,
+    serverSideEdit,
+    primaryKey,
+    wrapperDivClass,
+    showFilter,
+    addRemove,
+    pageSelector,
+    pagingSelector,
+    searchPlaceHolder,
+    onEnterMoveDown,
     tableCellClass
   } = props;
-  const [pageActual, setPageActual] = useState(1);
-  const [pageLength, setPageLength] = useState(pagingOptions[0] || 10);
-  const [tableFilterValue, setTableFilterValue] = useState('');
-  const [sortState, setSortState] = useState({ col: undefined, dir: undefined });
   const [pageData, setPageData] = useState([]);
 
+  const pageActual = useRef(1);
+  const pageLength = useRef(pagingOptions[0] || 10);
+  const tableFilterValue = useRef('');
+  const sortState = useRef({ col: undefined, dir: undefined });
 
   // --------------------------------------------------------------------------
   // On first data load we create:
@@ -106,6 +156,7 @@ const GridAct = (props) => {
 
   const fnGetActiveCell = () => activeCell.current;
   const fnSetActiveCell = (newActiveCell) => {
+    console.log('NEW ACTIVE CELL', newActiveCell)
     activeCell.current = newActiveCell;
   };
 
@@ -122,37 +173,29 @@ const GridAct = (props) => {
   const fnGetRef = (x, y) => refStore.current[`${String(x)}-${String(y)}`].current;
 
   useEffect(() => {
-  }, []);
-
-  useEffect(() => {
     if (data) {
       if (data.length) {
         data2.current = data.slice();
         tableData.current = data.slice();
-        setPageActual(1);
+        pageActual.current = 1;
         // setPageLength not necessary, only to keep exhaustive-deps lint rule
-        setPageLength((curPageLength) => {
-          setPageData(tableData.current.slice(0, curPageLength));
-          return curPageLength;
-        });
+        setPageData(tableData.current.slice(0, pageLength.current));
       }
     }
   }, [data]);
 
-
   useEffect(() => {
-    console.log('PAGE DATA ACTUAL: ', pageData)
-    if (fnGetActiveCell()[0] >= 0 && fnGetActiveCell()[1] >= 0 && fnGetActiveCell()[1] > pageData.length - 1) {
+    if (
+      activeCell.current[0] >= 0
+      && activeCell.current[1] >= 0
+      && activeCell.current[1] > pageData.length - 1
+    ) {
       activeCell.current = [activeCell.current[0], pageData.length - 1];
       fnGetRef(activeCell.current[0], activeCell.current[1]).focus();
-    } else if (fnGetActiveCell()[0] >= 0 && fnGetActiveCell()[1] >= 0) {
+    } else if (activeCell.current[0] >= 0 && activeCell.current[1] >= 0) {
       fnGetRef(activeCell.current[0], activeCell.current[1]).focus();
     }
   });
-
-  useEffect(() => {
-    setPageData(tableData.current.slice((pageActual - 1) * pageLength, pageActual * pageLength));
-  }, [tableData, pageLength, pageActual, sortState]);
 
   // --------------------------------------------------------------------------
   // On pageChange we first calculate new page (check if less then 1st and
@@ -161,17 +204,19 @@ const GridAct = (props) => {
     let newPage = 0; // for calculating new page
     switch (dir) {
       case '-1':
-        newPage = pageActual - 1 < 1 ? 1 : pageActual - 1;
+        newPage = pageActual.current - 1 < 1 ? 1 : pageActual.current - 1;
         break;
       case '+1':
-        newPage = pageActual + 1 > Math.ceil(tableData.current.length / pageLength)
-          ? Math.ceil(tableData.current.length / pageLength) : pageActual + 1;
+        newPage = pageActual.current + 1
+          > Math.ceil(tableData.current.length / pageLength.current)
+          ? Math.ceil(tableData.current.length / pageLength.current)
+          : pageActual.current + 1;
         break;
       case 'first':
         newPage = 1;
         break;
       case 'last':
-        newPage = Math.ceil(tableData.current.length / pageLength);
+        newPage = Math.ceil(tableData.current.length / pageLength.current);
         break;
       default:
         newPage = 1;
@@ -179,14 +224,22 @@ const GridAct = (props) => {
     // const startIndex = (newPage - 1) * pageLength;
     // const endIndex = newPage * pageLength;
     // pageData = tableData.current.slice(startIndex, endIndex); // calculate pageData
-    setPageActual(newPage);
+    pageActual.current = newPage;
+    setPageData(
+      tableData.current.slice(
+        (newPage - 1) * pageLength.current,
+        newPage * pageLength.current
+      )
+    );
   };
 
   // --------------------------------------------------------------------------
   // Changing page length, setting new pageData and resetting actual page to 1st.
-  const changePageLength = (e) => { // change page length
-    setPageActual(1); // always go back to first page
-    setPageLength(parseInt(e.target.value, 0)); // set new page length
+  const changePageLength = (e) => {
+    // change page length
+    pageActual.current = 1; // always go back to first page
+    pageLength.current = parseInt(e.target.value, 0); // set new page length
+    setPageData(tableData.current.slice(0, pageLength.current));
   };
 
   // --------------------------------------------------------------------------
@@ -212,15 +265,18 @@ const GridAct = (props) => {
       newTableData = data2.current.filter(row => Object.keys(row).some((col) => {
         if (row[col]) {
           // list of results false ,true
-          const test = testGroups.map(g => String(row[col]).toLowerCase().includes(g.toLowerCase()));
+          const test = testGroups.map(g => String(row[col])
+            .toLowerCase()
+            .includes(g.toLowerCase()));
           return test.every(t => t);
         }
         return false;
       }));
     }
     tableData.current = newTableData;
-    setPageActual(1);
-    setTableFilterValue(e.target.value);
+    pageActual.current = 1;
+    tableFilterValue.current = e.target.value;
+    setPageData(tableData.current.slice(0, pageLength.current));
   };
 
   // --------------------------------------------------------------------------
@@ -252,41 +308,62 @@ const GridAct = (props) => {
     if (!colDefs[col].sortable) return;
     let sortedData = [];
     switch (true) {
-      case (sortState.col === col && sortState.dir === 'asc'):
+      case sortState.current.col === col && sortState.current.dir === 'asc':
         sortedData = tableData.current.slice().sort((a, b) => {
           if (a[col] > b[col]) return -1;
           if (a[col] < b[col]) return 1;
           return 0;
         });
         tableData.current = sortedData;
-        setSortState({ col, dir: 'desc' });
+        sortState.current = { col, dir: 'desc' };
+        setPageData(
+          tableData.current.slice(
+            (pageActual.current - 1) * pageLength.current,
+            pageActual.current * pageLength.current
+          )
+        );
         break;
-      case (sortState.col === col && sortState.dir === 'desc'):
+      case sortState.current.col === col && sortState.current.dir === 'desc':
         sortedData = data2.current.slice();
-        if (tableFilterValue.length) { // have to setup applied table filter
-          const testGroups = String(tableFilterValue).match(/(\S+)/g);
+        if (tableFilterValue.current.length) {
+          // have to setup applied table filter
+          const testGroups = String(tableFilterValue.current).match(/(\S+)/g);
           sortedData = data2.current.filter(row => Object.keys(row).some((c) => {
             if (row[c]) {
-              const test = testGroups.map(g => String(row[c]).toLowerCase().includes(g.toLowerCase())); // list of results false ,true
+              const test = testGroups.map(g => String(row[c])
+                .toLowerCase()
+                .includes(g.toLowerCase())); // list of results false ,true
               return test.every(t => t);
             }
             return false;
           }));
         }
         tableData.current = sortedData;
-        setSortState({ col: undefined, dir: undefined });
+        sortState.current = { col: undefined, dir: undefined };
+        setPageData(
+          tableData.current.slice(
+            (pageActual.current - 1) * pageLength.current,
+            pageActual.current * pageLength.current
+          )
+        );
         break;
-      default: // first click => sort asc
+      default:
+        // first click => sort asc
         sortedData = tableData.current.slice().sort((a, b) => {
           if (a[col] < b[col]) return -1;
           if (a[col] > b[col]) return 1;
           return 0;
         });
         tableData.current = sortedData;
-        setSortState({ col, dir: 'asc' });
+        sortState.current = { col, dir: 'asc' };
+        setPageData(
+          tableData.current.slice(
+            (pageActual.current - 1) * pageLength.current,
+            pageActual.current * pageLength.current
+          )
+        );
     }
   };
-
 
   const addRow = () => {
     tableData.current = data2.current;
@@ -313,9 +390,10 @@ const GridAct = (props) => {
         tableData.current = data2.current.slice();
         // pageData.current.unshift(nR);
         activeCell.current = [0, 0];
-        setPageActual(1);
-        setTableFilterValue('');
-        setSortState({ col: undefined, dir: undefined });
+        pageActual.current = 1;
+        tableFilterValue.current = '';
+        sortState.current = { col: undefined, dir: undefined };
+        setPageData(tableData.current.slice(0, pageLength.current));
       })
       .catch((err) => {
         throw Error(err);
@@ -326,20 +404,20 @@ const GridAct = (props) => {
     // prepare deleted data with primaryKey
     if (!(activeCell.current[0] >= 0) || !(activeCell.current[1] >= 0)) return null;
     const delData = {};
-    delData[primaryKey] = pageData[fnGetActiveCell()[1]][primaryKey];
+    delData[primaryKey] = pageData[activeCell.current[1]][primaryKey];
     serverSideEdit({ operation: 'delete', data: delData })
       .then((rs) => {
         let parsedRes;
         if (typeof rs === 'string') {
           try {
-          // try to parse as JSON
+            // try to parse as JSON
             parsedRes = JSON.parse(rs);
           } catch (e) {
             throw Error(`Not a JSON string ${JSON.stringify(e)}`);
           }
         } else if (typeof rs === 'object') {
           try {
-          // try to parse as JSON
+            // try to parse as JSON
             parsedRes = JSON.parse(JSON.stringify(rs));
           } catch (e) {
             throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
@@ -348,7 +426,7 @@ const GridAct = (props) => {
         console.log('PARSED RES: ', parsedRes);
         if (!parsedRes.error) {
           if (parsedRes.data > 0) {
-          // Modify data2 - remove deletedRow
+            // Modify data2 - remove deletedRow
             const idxOfDeletedRow = data2.current
               .map(rw => rw[primaryKey])
               .indexOf(delData[primaryKey]);
@@ -360,19 +438,40 @@ const GridAct = (props) => {
             tableData.current.splice(idxOfDeletedRowTableData, 1);
             console.log('new table data', tableData);
             // calculate new pageActual - you can delete last item on page
-            if (Math.ceil(data2.current.length / pageLength) < pageActual) {
+            const allPages = Math.ceil(
+              tableData.current.length / pageLength.current
+            );
+            if (allPages < pageActual.current) {
               console.log('LAST ITEM OF LAST PAGE');
               // last item of last page was deleted => totalPages < pageActual
               // we have to set last page of new dataSet (shorter of delete line)
-              const allPages = Math.ceil(tableData.current.length / pageLength);
-              // setPageData(tableData.current.slice((allPages - 1) * pageLength, allPages * pageLength));
               // set new position for cursor focus
-              activeCell.current = [activeCell.current[0], pageLength - 1];
-              setPageActual(allPages);
+              activeCell.current = [
+                activeCell.current[0],
+                pageLength.current - 1
+              ];
+              console.log(
+                'actualPage: ',
+                pageActual.current,
+                'allPages: ',
+                allPages
+              );
+              console.log('ACTIVE CELL AFTER CHANGE: ', activeCell.current);
+              pageActual.current = allPages;
+              setPageData(
+                tableData.current.slice(
+                  (allPages - 1) * pageLength.current,
+                  allPages * pageLength.current
+                )
+              );
             } else {
               console.log('NOT LAST ITEM ON PAGE');
-              setPageData(tableData.current.slice((pageActual - 1) * pageLength, pageActual * pageLength));
-              // forceRender(p => p + 1);
+              setPageData(
+                tableData.current.slice(
+                  (pageActual.current - 1) * pageLength.current,
+                  pageActual.current * pageLength.current
+                )
+              );
             }
           } else {
             console.log('NO ROW REMOVED');
@@ -389,10 +488,11 @@ const GridAct = (props) => {
   return (
     <div className="main-table-container">
       <div className="table-control">
-        {showFilter
-          && (
+        {showFilter && (
           <div className="search-control display-inline">
-            <span className="FFInputDesc"><TableSearchIcon /></span>
+            <span className="FFInputDesc">
+              <TableSearchIcon />
+            </span>
             <input
               className="FFInputField paging-font"
               style={{ width: '200px' }}
@@ -400,23 +500,25 @@ const GridAct = (props) => {
               type="text"
               onFocus={e => fnSetActiveCell([undefined, undefined])}
               placeholder={searchPlaceHolder}
-              value={tableFilterValue}
+              value={tableFilterValue.current}
               onChange={fnChangeTableFilter}
               ref={inputFieldRef}
             />
           </div>
-          )
-          }
+        )}
         {addRemove && (
-        <div className="add-remove-control display-inline">
-          <AddRemoveButtons addRow={addRow} removeRow={removeRow} addRemove={addRemove} />
-        </div>
-        )
-          }
+          <div className="add-remove-control display-inline">
+            <AddRemoveButtons
+              addRow={addRow}
+              removeRow={removeRow}
+              addRemove={addRemove}
+            />
+          </div>
+        )}
         <div className="paging-control display-inline">
           {pagingSelector && (
             <PagingSelector
-              pageLength={pageLength}
+              pageLength={pageLength.current}
               changePageLength={changePageLength}
               pagingOptions={pagingOptions}
               key="10"
@@ -426,8 +528,8 @@ const GridAct = (props) => {
             <PageSelector
               changePage={changePage}
               tableDataLength={tableData.current.length}
-              pageLength={pageLength}
-              pageActual={pageActual}
+              pageLength={pageLength.current}
+              pageActual={pageActual.current}
               key="11"
             />
           )}
@@ -436,11 +538,11 @@ const GridAct = (props) => {
 
       <DataTable
         key="13"
-        data={pageData}
+        pageData={pageData}
         colDefs={colDefs}
         tableClasses={tableClasses}
         sortTable={fnSortTable}
-        sortState={sortState}
+        sortState={sortState.current}
         fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
         fnRowClass={fnRowClass}
         serverSideEdit={serverSideEdit}
@@ -453,12 +555,11 @@ const GridAct = (props) => {
         wrapperDivClass={wrapperDivClass}
         onEnterMoveDown={onEnterMoveDown}
         tableCellClass={tableCellClass}
+        setPageData={setPageData}
       />
-
     </div>
   );
 };
-
 
 export default React.memo(GridAct);
 

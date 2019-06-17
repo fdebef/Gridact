@@ -1,138 +1,72 @@
-import React from 'react';
-
-const cols = {
-  line_id: {
-    cellRender: v => v,
-    name: 'ID',
+const colDefs = {
+  id: {
+    tableHead: "id",
     editable: false,
-    // filterEditValue: function | regexp of chars to filter out (newValue.prototype.replace(regexp, '')
-    filterEditValue: (newValue, curCellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, '')),
-    // filterEditValue: function which returns true to allow or false for disable char
-    // regexp of chars allowed (newValue.prototype.match(regexp))
-    filterEditChar: (char, cellValue, row) => char.match(/[a-zA-ZščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮ0-9 ]/g),
     sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 80,
-    hidden: false
+    width: 50,
+    hidden: false,
+    fnCellClass: "text-center"
   },
-  pdk: {
-    cellRender: (v, row) => v,
-    name: 'PDK',
+  name: {
+    cellRender: (v, row) => "xx" + v,
+    tableHead: "Name",
+    filterEditValue: (newValue, cellValue, row) =>
+      newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, ""),
+    filterEditChar: (char, cellValue, row) =>
+      char.match(/[a-zA-ZščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮ0-9 ]/),
     editable: true,
     sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 80,
-    cellClass: 'text-left', // string | list | function returns string or list
-    thClass: 'text-primary' // string
-  },
-  name_pdk: {
-    cellRender: v => v,
-    filterEditValue: (newValue, cellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, '')),
-    filterEditChar: (char, cellValue, row) => (char.match(/[a-zA-ZščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮ0-9 ]/)),
-    name: 'Název PDK',
-    editable: true,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 200
-  },
-  name_original: {
-    name: 'Název původní',
-    editable: true,
-    sortable: true,
-    filterable: true,
-    resizable: true,
     width: 200,
-    cellClass: (rwdt) => {
-      if (rwdt.spoh > 8) return 'text-success font-weight-bold';
+    fnCellClass: "text-success", // string | list | function returns string or list
+    thClass: "bg-warning" // string
+  },
+  address: {
+    cellRender: v => v,
+    tableHead: "Street address",
+    editable: true,
+    sortable: true,
+    width: 200,
+    fnCellClass: (cv, rw) => {
+      if (cv) {
+        if (cv.slice(0, 1) > 5) return "text-primary";
+      }
+    }
+  },
+  city: {
+    tableHead: "City",
+    editable: true,
+    sortable: true,
+    width: 200,
+    fnCellClass: (cv, rwdt) => {
+      if (rwdt.id % 2) return "text-success font-weight-bold";
       return undefined;
     }
   },
-  note: {
-    name: 'Poznámka',
+  volume: {
+    tableHead: "Volume",
     editable: true,
     sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 200
-  },
-  spoh: {
-    cellRender: v => v,
-    name: 'SPOH',
-    editable: true,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40,
-    class: 'text-right'
-  },
-  ppoh: {
-    cellRender: v => v,
-    name: 'PPOH',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40
-  },
-  npoh: {
-    cellRender: v => v,
-    name: 'NPOH',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40
-  },
-  opoh: {
-    cellRender: v => v,
-    name: 'OPOH',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40
-  },
-  sklb: {
-    cellRender: v => v,
-    name: 'SKLB',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40,
-    cellClass: 'text-right',
-    thClass: 'text-left'
-  },
-  pklb: {
-    cellRender: v => v,
-    name: 'PKLB',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40
-  },
-  nklb: {
-    cellRender: v => v,
-    name: 'NKLB',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40
-  },
-  oklb: {
-    cellRender: v => v,
-    name: 'OKLB',
-    editable: false,
-    sortable: true,
-    filterable: true,
-    resizable: true,
-    width: 40
+    width: 100,
+    filterEditValue: (newValue, cellValue, row) => {
+      console.log(
+        "NEW VALUE: ",
+        Number.parseInt(newValue),
+        newValue !== Number.parseInt(newValue)
+      );
+      if (newValue !== Number.parseInt(newValue, 0)) {
+        console.log("----------------");
+        return cellValue;
+      } else {
+        return newValue;
+      }
+    },
+    filterEditChar: (char, cellValue, row) => char.match(/[0-9]/),
+    fnCellClass: (cv, rw) => {
+      if (cv < 0) return "bg-danger text-white text-right";
+      return "text-right";
+    },
+    thClass: "font-weight-bold text-warning"
   }
 };
 
-export default cols;
+export default colDefs;

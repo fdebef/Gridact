@@ -1,9 +1,10 @@
 import React, {
-  useCallback, useEffect, useRef, useState
+  useEffect, useRef, useState
 } from 'react';
 import cellClassNames from './cellClassNames';
 import CellModalWarning from './CellModalWarning';
 import serverUpdate from './serverUpdate';
+import propsAreEqual from './propsAreEqual';
 
 /* eslint-disable react/prop-types */
 const MyReactCell = (props) => {
@@ -18,12 +19,11 @@ const MyReactCell = (props) => {
     fnNavigation,
     row,
     fnUpdateDataOnEditWithoutRender,
-    fnUpdateRowData,
     serverSideEdit,
     primaryKey,
     removeRow,
     tableCellClass,
-    setRowData
+    setPageData
   } = props;
 
   // TODO: Try to put this into useRef
@@ -46,6 +46,19 @@ const MyReactCell = (props) => {
     }
   };
 
+  const updatePageDataWithRow = (newRow, y) => {
+    console.log('THIS IS Y IN UPDATE', y);
+    setPageData(prev => [...prev.slice(0, y), newRow, ...prev.slice(y + 1)]);
+  };
+
+  const updatePageDataWithCell = (newCell, col, y) => {
+    setPageData(prev => [
+      ...prev.slice(0, y),
+      { ...prev[y], [col]: newCell },
+      ...prev.slice(y + 1)
+    ]);
+  };
+
   const fnFilterEditChar = (char, curCellValue, curRow) => {
     switch (Object.prototype.toString.call(colDefs[col].filterEditChar)) {
       case '[object Function]':
@@ -66,20 +79,18 @@ const MyReactCell = (props) => {
   };
 
   const [valueState, setValueState] = useState(undefined);
-  const [renderCount, forceRender] = useState(0);
   const editMode = useRef({ active: false, curValue: undefined });
-  const [editModeState, setEditModeState] = useState({ active: false, prevValue: undefined });
-  const [modalWarningActive, setModalWarningActive] = useState({
-    active: false,
-    text: undefined
-  });
+  const [editModeStateActive, setEditModeStateActive] = useState(false);
+  const [modalWarningActive, setModalWarningActive] = useState(false);
+  const [modalWarningText, setModalWarningText] = useState(false);
+
   // define ref to cell and store it to the store
   const cellRef = useRef(null);
   const divEditRef = useRef(null);
   fnUpdateRefStore(x, y, cellRef);
 
   // cell renderer based on colDefs
-  const cellRenderer = useCallback((celVal, rw) => {
+  const cellRenderer = (celVal, rw) => {
     switch (Object.prototype.toString.call(colDefs[col].cellRender)) {
       case '[object Function]':
         return colDefs[col].cellRender(celVal, rw);
@@ -90,7 +101,7 @@ const MyReactCell = (props) => {
       default:
         return celVal;
     }
-  }, [colDefs, col]);
+  };
 
   /* eslint-disable max-len */
   const setEndOfContenteditable = (contentEditableElement) => {
@@ -102,19 +113,9 @@ const MyReactCell = (props) => {
     selection.addRange(range); // make the range you have just created the visible selection
   };
 
-  const [origValue, setOrigValue] = useState(cellValue);
-
   useEffect(() => {
-    if (editModeState.active) setEndOfContenteditable(divEditRef.current);
-  }, [editModeState]);
-
-  useEffect(() => {
-    setValueState(cellRenderer(cellValue, row));
-    setOrigValue(cellValue);
-  }, [cellRenderer, cellValue, row]);
-
-  useEffect(() => {}, [valueState]);
-
+    if (editModeStateActive) setEndOfContenteditable(divEditRef.current);
+  }, [editModeStateActive]);
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -122,13 +123,13 @@ const MyReactCell = (props) => {
   // in keyPress, so we have to setup spacePressed variable to allow space
   // processing in keyDown
   const keyDn = (e) => {
-    switch (editModeState.active) {
+    switch (editModeStateActive) {
       case false: // non editing mode
         switch (true) {
           case [13, 113].includes(e.keyCode): // enter, F2
             if (colDefs[col].editable) {
               e.preventDefault();
-              setEditModeState({ active: true, prevValue: origValue });
+              setEditModeStateActive(true);
               // curValue is calculated from data - better then taken from innerText, that might be changed
               // editMode.current = { active: true, curValue: cellValue };
               // console.log('-------------', editMode.current.curValue);
@@ -138,7 +139,8 @@ const MyReactCell = (props) => {
             break;
           case [27].includes(e.keyCode):
             e.preventDefault();
-            setModalWarningActive({ active: false, text: false });
+            setModalWarningActive(false);
+            setModalWarningText(undefined);
             break;
           case [37, 38, 39, 40, 36, 35, 33, 34, 9].includes(e.keyCode): // arrow navigation
             e.preventDefault();
@@ -153,63 +155,53 @@ const MyReactCell = (props) => {
         }
         break;
       case true: // editing mode
+        // eslint-disable-next-line no-case-declarations
         switch (true) {
           case [9, 13].includes(e.keyCode): // ENTER + TAB - leave with save
             e.preventDefault();
             // eslint-disable-next-line no-case-declarations
             const sanitizedInnerText = fnFilterEditedValue(
               cellRef.current.innerText,
-              valueState,
+              cellValue,
               row
             );
             console.log('SANITIZED: ', sanitizedInnerText);
             // only disable active
-            setValueState(divEditRef.current.value);
-            setEditModeState(prev => ({ ...prev, active: false }));
+            updatePageDataWithCell(sanitizedInnerText, col, y);
+            setEditModeStateActive(false);
             // if value was changed (curValue before edit is not same as sanitized text
-            if (editModeState.curValue !== sanitizedInnerText) {
+            if (cellValue !== sanitizedInnerText) {
               const operData = {};
-              setValueState(cellRenderer(sanitizedInnerText));
               operData[col] = sanitizedInnerText;
               operData[primaryKey] = row[primaryKey]; // data for server must be in {line_id: 12932, some_col: 'new value'}
               const dataToSend = { operation: 'edit', data: operData };
               serverUpdate(dataToSend, colDefs, serverSideEdit)
                 .then((updRow) => {
                   console.log('RETURNED ROW', updRow);
+                  // fnUpdateDataOnEditWithoutRender(updRow);
+                  updatePageDataWithRow(updRow, y);
                   fnUpdateDataOnEditWithoutRender(updRow);
-                  setValueState(cellRenderer(updRow[col]));
-                  setRowData(updRow); // update whole current row Data
-                  setModalWarningActive({ active: false, text: null });
-                  setEditModeState({ active: false, curValue: undefined });
+                  setModalWarningActive(false);
+                  setModalWarningText(undefined);
                   fnNavigation(913); // move cursor
                 })
                 .catch((err) => {
-                  // curValue must be preserved as editMode is changed before promise gets resolved
-                  setEditModeState((cv) => {
-                    setValueState(cellRenderer(cv.curValue));
-                    setModalWarningActive({ active: true, text: err });
-                    return { active: false, curValue: undefined };
-                  });
+                  setModalWarningActive(true);
+                  setModalWarningText(err);
+                  cellRef.current.focus();
                 });
             } else {
-              setEditModeState((cv) => {
-                setValueState(cellRenderer(cv.curValue));
-                setModalWarningActive({ active: true, text: err });
-                return { active: false, curValue: undefined };
-              });
+              setEditModeStateActive(true);
+              cellRef.current.focus();
             }
             break;
           case e.keyCode === 27: // ESC - leaving without update database
             e.preventDefault();
             // eslint-disable-next-line no-case-declarations
-            const { prevValue } = editModeState;
-            console.log('THIS IS PREVIOUS VALUE: ', prevValue);
-            Promise.resolve().then(() => {
-              setValueState(cellRenderer(prevValue));
-              setEditModeState({ active: false, prevValue: undefined });
-              setModalWarningActive({ active: false, text: undefined });
-              cellRef.current.focus();
-            });
+            setEditModeStateActive(false);
+            setModalWarningActive(false);
+            setModalWarningText(undefined);
+            cellRef.current.focus();
             break;
           default:
             break;
@@ -231,23 +223,22 @@ const MyReactCell = (props) => {
   };
 
   const onBlr = (e) => {
-    console.log('CELL BLURED');
-    if (editMode.current.active) {
-      // leaving cell without Enter
-      const cvBlr = editMode.current.curValue;
-      Promise.resolve().then(() => {
-        setValueState(cellRef.current.innerText);
-        setValueState(cvBlr); // set original value
-      });
-      editMode.current = { active: false, curValue: undefined };
+    setEditModeStateActive(false);
+    setModalWarningActive(false);
+    setModalWarningText(undefined);
+  };
+
+  const onBlrModal = () => {
+    if (modalWarningActive) {
+      setModalWarningActive(false);
+      setModalWarningText(undefined);
     }
-    if (modalWarningActive.active) setModalWarningActive({ active: false, text: undefined });
   };
 
   const onFoc = () => {
+    console.log('ON FOCUS', x, y)
     fnSetActiveCell([x, y]);
   };
-
 
   const widthStyle = (width) => {
     if (width) {
@@ -257,24 +248,28 @@ const MyReactCell = (props) => {
 
   return (
     <td
-      className={[cellClassNames(colDefs[col].fnCellClass, cellValue, row), tableCellClass].join(' ')}
+      className={[
+        cellClassNames(colDefs[col].fnCellClass, cellValue, row),
+        tableCellClass
+      ].join(' ')}
       style={{ ...widthStyle(colDefs[col].width) }}
       role="gridcell"
       key={`${String(y)}-${String(x)}`}
       ref={cellRef}
       id={`${String(y)}-${String(x)}`}
       tabIndex={-1}
+      onBlur={onBlrModal}
       // contentEditable={editMode.current.active}
       // suppressContentEditableWarning
       onKeyDown={keyDn}
       onFocus={onFoc}
-      onBlur={onBlr}
       onKeyPress={keyPs}
     >
-      {!editModeState.active && valueState}
-      {editModeState.active && (
+      {!editModeStateActive && cellRenderer(cellValue)}
+      {editModeStateActive && (
         <div
           style={{ outline: 'none' }}
+          onBlur={onBlr}
           contentEditable
           suppressContentEditableWarning
           ref={divEditRef}
@@ -282,10 +277,13 @@ const MyReactCell = (props) => {
           {cellValue}
         </div>
       )}
-      {modalWarningActive.active && (
-        <CellModalWarning cellRef={cellRef} show x={x} y={y}>{modalWarningActive.text}</CellModalWarning>
+      {modalWarningActive && (
+        <CellModalWarning cellRef={cellRef} show x={x} y={y}>
+          {modalWarningText}
+        </CellModalWarning>
       )}
     </td>
   );
 };
-export default MyReactCell;
+
+export default React.memo(MyReactCell, propsAreEqual);
