@@ -1,6 +1,6 @@
 {
   "name": "gridact",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Your Excellent React Grid Component",
   "main": "index.js",
   "scripts": {

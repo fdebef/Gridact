@@ -24,10 +24,11 @@ Gridact is React component for displaying large datasets in table supporting
 
 ##**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
 
-##Changelog 0.7.0
+##Changelog 0.6.2
 - **Renamed name of columns from name to tableHead in colDefs**<br>
 - Removed Bootstrap in whole app, now you can fully customize by CSS
 - Optimization of rendering
+- Optimized re-render evaluation on row (propsAreEqual.js) 
  
 ## GridAct
 
@@ -96,10 +97,6 @@ const App = () => {
   />
       
 ```
-
-## Styling
-You can fully style with own classes. See custom `styles.css`. GridAct is built on CSS grid. 
-
 ## Gridact props ##
 ### data ###
 Type: _Array of Objects_ **\<mandatory\>**<br>
@@ -223,6 +220,12 @@ Function is passed `cell_value` and `row_data`. This means, you can render the c
 *Example:*
 `cellRender: (cellValue, rowData) => if (rowData.volume) > 10 return 'TOO HIGH' else return cellValue` 
   
+**Special attention on circular objects as cellRender:**
+You can pass function returning React Components to cellRender (e.g. `input select` in table head). As GridAct uses 
+on row level custom property change evalution (React.memo, or formerly known as ComponentShouldUpdate), if you pass 
+in cellRender circular objects other then React Component , application with crash. For common use this should not 
+limit you.     
+  
 #### tableHead (!changed in version 0.6.0 - previously "name") 
 Type: string **\<mandatory\>**<br>
 Name of column in table header
@@ -278,10 +281,7 @@ Function is passed three arguments: `(new_cell_value, cell_value_before_edit, ro
 If RegExp is provided, it is passed to `newValue.replace(RegExp, '')`
 
 ## Styling
-You can find basic stylesheet in src on GitHub, you can simply overwrite it on your own.
-For best results I do recommend using Bootstrap ^4.3 and styling table, rows and cells with bootstrap classes.
-Currently it is not possible to change icons, surely will be in future version. **mdi-react** must be installed
-to icons working properly.
+You can fully style with own classes. See custom `styles.css`. GridAct is built on CSS grid. 
  
 # Further development
 I'll be glad if you leave me a message. What you miss, what you want, what you like.
