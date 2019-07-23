@@ -24,11 +24,11 @@ Gridact is React component for displaying large datasets in table supporting
 
 ##**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
 
-##Changelog 0.6.2
-- **Renamed name of columns from name to tableHead in colDefs**<br>
-- Removed Bootstrap in whole app, now you can fully customize by CSS
-- Optimization of rendering
-- Optimized re-render evaluation on row (propsAreEqual.js) 
+##Changelog 1.0.0
+- First production version is here!
+- Further optimized re-render evaluation on row (propsAreEqual.js)
+- Code readability improved 
+- Access to filtered rows, so you can e.g. calculate total sums to your table header (look at setFilteredData prop)
  
 ## GridAct
 
@@ -119,6 +119,10 @@ Best use with boostrap's table classes. E.g. ```['table', 'table-sm', 'table-str
 Type: _String_ _\<option>_<br>
 Easy cell styling, changes style of `th` and `td` cells in table.
  
+###setFilteredData ###
+Type: _Function_ _\<option>_<br>
+Function will be passed with filtered dataset `Array` - subset of originaly provided table data.
+Necessary e.g. for sum of filtered columns.
 
 ### pagingOptions ###
 Type: _Array_ _\<option>_<br>

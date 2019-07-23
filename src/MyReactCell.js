@@ -29,7 +29,8 @@ const MyReactCell = (props) => {
   // TODO: Try to put this into useRef
 
   const fnFilterEditedValue = (newValue, curCellValue, curRow) => {
-    console.log(Object.prototype.toString.call(colDefs[col].filterEditValue));
+    console.log('FILTER DEFINITION: ', colDefs[col].filterEditValue);
+    console.log('NEW VAL, CURCELL', newValue, curCellValue);
     switch (Object.prototype.toString.call(colDefs[col].filterEditValue)) {
       case '[object Function]':
         return colDefs[col].filterEditValue(newValue, curCellValue, curRow);
@@ -47,7 +48,6 @@ const MyReactCell = (props) => {
   };
 
   const updatePageDataWithRow = (newRow, y) => {
-    console.log('THIS IS Y IN UPDATE', y);
     setPageData(prev => [...prev.slice(0, y), newRow, ...prev.slice(y + 1)]);
   };
 
@@ -161,12 +161,13 @@ const MyReactCell = (props) => {
             e.preventDefault();
             // eslint-disable-next-line no-case-declarations
             const sanitizedInnerText = fnFilterEditedValue(
-              cellRef.current.innerText,
+              divEditRef.current.innerText,
               cellValue,
               row
             );
             console.log('SANITIZED: ', sanitizedInnerText);
-            // only disable active
+            // eslint-disable-next-line no-case-declarations
+            const cellPrevValue = cellValue;
             updatePageDataWithCell(sanitizedInnerText, col, y);
             setEditModeStateActive(false);
             // if value was changed (curValue before edit is not same as sanitized text
@@ -178,7 +179,6 @@ const MyReactCell = (props) => {
               serverUpdate(dataToSend, colDefs, serverSideEdit)
                 .then((updRow) => {
                   console.log('RETURNED ROW', updRow);
-                  // fnUpdateDataOnEditWithoutRender(updRow);
                   updatePageDataWithRow(updRow, y);
                   fnUpdateDataOnEditWithoutRender(updRow);
                   setModalWarningActive(false);
@@ -186,6 +186,7 @@ const MyReactCell = (props) => {
                   fnNavigation(913); // move cursor
                 })
                 .catch((err) => {
+                  updatePageDataWithCell(cellPrevValue, col, y);
                   setModalWarningActive(true);
                   setModalWarningText(err);
                   cellRef.current.focus();
@@ -236,7 +237,6 @@ const MyReactCell = (props) => {
   };
 
   const onFoc = () => {
-    console.log('ON FOCUS', x, y)
     fnSetActiveCell([x, y]);
   };
 
@@ -286,4 +286,4 @@ const MyReactCell = (props) => {
   );
 };
 
-export default React.memo(MyReactCell, propsAreEqual);
+export default React.memo(MyReactCell);

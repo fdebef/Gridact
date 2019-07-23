@@ -1,0 +1,280 @@
+/* gridact style sheet */
+
+:root {
+    --mygrey: #ced4da;
+    --mygreybackground: #e9ecef
+}
+
+.main-table-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-left: 5px;
+    margin-right: 5px
+}
+
+.table-control {
+    display: grid;
+    grid-template-rows: 40px;
+    grid-template-columns: minmax(260px, 3fr) minmax(120px, 1fr) minmax(300px, 3fr)
+}
+
+
+.search-control {
+    grid-area: 1 / 1 / 2 / 2;
+    justify-content: start
+}
+
+.add-remove-control {
+    grid-area: 1 / 2 / 2 / 3;
+    justify-content: center
+}
+
+.paging-control {
+    grid-area: 1 / 3 / 2 / 4;
+    justify-content: end;
+}
+
+.display-inline {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+}
+
+.align-left {
+    justify-content: start
+}
+
+.align-center {
+    justify-content: center
+}
+
+.align-right {
+    justify-content: end;
+}
+
+
+.selCols {
+    background: #87c3ff;
+    width: 100%;
+}
+
+
+.rt-td {
+    line-height: 20px !important;
+    padding: 4px !important;
+}
+
+
+
+div.react-grid-HeaderCell {
+    padding: 2px 0px 0px 0px;
+    text-align: center;
+}
+
+button.forward {
+    background: none;
+    border: 0;
+    color: dodgerblue;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.paging-font {
+    color: dodgerblue;
+    font-size: 15px
+}
+
+button.zero {
+    background: none;
+    border: 0;
+}
+
+@keyframes cellFocus {
+    0% {
+        background-color: white;
+    }
+    50% {
+        background-color: lightskyblue;
+    }
+    100% {
+        background-color: limegreen;
+    }
+}
+
+td:focus {
+    background-color: limegreen !important;
+    animation-name: cellFocus;
+    animation-duration: 250ms;
+}
+
+@keyframes rowgeneration {
+    0% {
+        background-color: white;
+    }
+    50% {
+        background-color: lightskyblue;
+    }
+    100% {
+        background-color: white;
+    }
+}
+
+tr.flash {
+    background-color: white;
+    animation-name: rowgeneration;
+    animation-duration: 250ms;
+}
+
+button.add {
+    height: 35px;
+    border: 0 solid rgba(0, 0, 0, 0);
+    background: limegreen;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+}
+
+button.add.left {
+    border: none;
+    outline: none;
+    background: limegreen;
+    -webkit-border-radius: 3px 0px 0px 3px;
+    -moz-border-radius: 3px 0px 0px 3px;
+    border-radius: 3px 0px 0px 3px;
+}
+
+button.add.right {
+    border: none;
+    outline: none;
+    background: limegreen;
+    -webkit-border-radius: 0px 3px 3px 0px;
+    -moz-border-radius: 0px 3px 3px 0px;
+    border-radius: 0px 3px 3px 0px;
+}
+
+
+button.add.right:focus, button.add.left:focus {
+    background: lightgreen;
+}
+
+
+button.remove {
+    outline: none;
+    height: 35px;
+    border: none;
+    background: orangered;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+}
+
+/*table {*/
+/*    table-layout: fixed;*/
+/*}*/
+
+.moverlay {
+    background: rgba(255, 150, 150, 0.9);
+    font-size: 0.8em;
+    color: white;
+    width: 150px;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    -webkit-border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px 3px 3px 3px;
+    border-radius: 3px 3px 3px 3px;
+}
+
+.FFtable {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    font-size: 0.9rem;
+    border-spacing: 0px;
+    border-collapse: collapse;
+
+}
+
+td {
+    height: 30px;
+    /*overflow: hidden;*/
+}
+
+.FFtable th,
+.FFtable td {
+    padding: 2px;
+    border: 1px solid var(--mygreyborder);
+}
+
+.FFtable thead th {
+    vertical-align: center;
+    height: 30px
+}
+
+.FFtable tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.table-head-cell-sort {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: column;
+    justify-content: start;
+    align-items: center;
+    padding: 2px
+}
+
+.table-head-cell-no-sort {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-flow: column;
+    justify-content: start;
+    align-items: center;
+    padding: 2px
+}
+
+.table-head-text {
+    grid-area: 1 / 1 / 2 / 2;
+    display: grid;
+    align-items: center;
+    justify-content: start;
+    width: 100%
+
+}
+
+.sort-arrows {
+    grid-area: 1 / 2 / 1 / 3;
+    display: grid;
+    align-items: end;
+    justify-content: end;
+}
+
+@media screen and (max-width: 800px) {
+    .table-control {
+    display: grid;
+    grid-template-rows: 40px 40px 40px;
+    grid-template-columns: 1fr
+}
+
+
+.search-control {
+    grid-area: 1 / 1 / 2 / 2;
+    justify-content: center;
+}
+
+.add-remove-control {
+    grid-area: 2 / 1 / 3 / 2;
+    justify-content: center;
+}
+
+.paging-control {
+    grid-area: 3 / 1 / 4 / 2;
+    justify-content: center;
+}
+}

@@ -66,4 +66,9 @@ const MyReactRow = (props) => {
   );
 };
 
-export default React.memo(MyReactRow, propsAreEqual);
+export default React.memo(MyReactRow, (prev, act) => {
+  if (propsAreEqual(prev.row, act.row)) {
+    return true;
+  }
+  return propsAreEqual(prev, act);
+});

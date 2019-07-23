@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState, useRef, useEffect, useContext
+} from 'react';
 import ChevronLeftIcon from 'mdi-react/ChevronLeftIcon';
 import ChevronDoubleLeftIcon from 'mdi-react/ChevronDoubleLeftIcon';
 import ChevronDoubleRightIcon from 'mdi-react/ChevronDoubleRightIcon';
@@ -7,7 +9,9 @@ import TableSearchIcon from 'mdi-react/TableSearchIcon';
 import TableRowAddBeforeIcon from 'mdi-react/TableRowAddBeforeIcon';
 import TableRowRemoveIcon from 'mdi-react/TableRowRemoveIcon';
 import FileDocumentBoxesOutlineIcon from 'mdi-react/FileDocumentBoxesOutlineIcon';
+import './styling.css';
 import DataTable from './DataTable';
+import TransferContext from '../context/TransferContext';
 
 //-----------------------------------------------------
 // Subcomponents for main component
@@ -131,10 +135,10 @@ const GridAct = (props) => {
     pagingSelector,
     searchPlaceHolder,
     onEnterMoveDown,
-    tableCellClass
+    tableCellClass,
+    setFilteredData
   } = props;
   const [pageData, setPageData] = useState([]);
-
   const pageActual = useRef(1);
   const pageLength = useRef(pagingOptions[0] || 10);
   const tableFilterValue = useRef('');
@@ -156,7 +160,6 @@ const GridAct = (props) => {
 
   const fnGetActiveCell = () => activeCell.current;
   const fnSetActiveCell = (newActiveCell) => {
-    console.log('NEW ACTIVE CELL', newActiveCell)
     activeCell.current = newActiveCell;
   };
 
@@ -177,6 +180,8 @@ const GridAct = (props) => {
       if (data.length) {
         data2.current = data.slice();
         tableData.current = data.slice();
+        tableFilterValue.current = '';
+        sortState.current = { col: undefined, dir: undefined };
         pageActual.current = 1;
         // setPageLength not necessary, only to keep exhaustive-deps lint rule
         setPageData(tableData.current.slice(0, pageLength.current));
@@ -274,6 +279,9 @@ const GridAct = (props) => {
       }));
     }
     tableData.current = newTableData;
+    if (Object.prototype.toString.call(setFilteredData) === '[object Function]') {
+      setFilteredData(newTableData);
+    }
     pageActual.current = 1;
     tableFilterValue.current = e.target.value;
     setPageData(tableData.current.slice(0, pageLength.current));
@@ -294,6 +302,15 @@ const GridAct = (props) => {
       .map(rw => rw[primaryKey])
       .indexOf(newRow[primaryKey]);
     tableData.current.splice(idxOfUpdatedRowInTableData, 1, newRow);
+    console.log('......................updating without render');
+    setFilteredData((prev) => {
+      const p = prev.slice()
+      console.log('PREV FILT DATA', p)
+      const idxOfPrevFilterData = p.map(rw => rw[primaryKey]).indexOf(newRow[primaryKey]);
+      p.splice(idxOfPrevFilterData, 1, newRow);
+      console.log('CHANGED FILT DATA: ', p)
+      return p;
+    });
   };
 
   // --------------------------------------------------------------------------
@@ -407,6 +424,7 @@ const GridAct = (props) => {
     delData[primaryKey] = pageData[activeCell.current[1]][primaryKey];
     serverSideEdit({ operation: 'delete', data: delData })
       .then((rs) => {
+        console.log('RETURNED FROM SERVER: ', rs);
         let parsedRes;
         if (typeof rs === 'string') {
           try {
