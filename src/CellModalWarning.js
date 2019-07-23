@@ -1,11 +1,19 @@
 import ReactDOM from 'react-dom';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const CellModalWarning = ({
   show, children, cellRef, x, y
 }) => {
   let modLeft = 0;
   let modTop = 0;
+
+  useEffect(
+    () => () => {
+      const modEl = document.getElementById('cellModalEl');
+      modEl.remove();
+    },
+    []
+  );
 
   if (!cellRef.current) return null;
   modLeft = cellRef.current.getBoundingClientRect().left + 10;
@@ -29,10 +37,12 @@ const CellModalWarning = ({
     >
       {children}
     </div>
-  );
+  ); const modEl = document.createElement('div');
+  modEl.id = 'cellModalEl';
+  document.body.appendChild(modEl);
   return (
     show
-      && ReactDOM.createPortal(modalDiv, document.getElementById('modalEl'))
+    && ReactDOM.createPortal(modalDiv, document.getElementById('cellModalEl'))
   );
 };
 

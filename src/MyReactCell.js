@@ -29,8 +29,6 @@ const MyReactCell = (props) => {
   // TODO: Try to put this into useRef
 
   const fnFilterEditedValue = (newValue, curCellValue, curRow) => {
-    console.log('FILTER DEFINITION: ', colDefs[col].filterEditValue);
-    console.log('NEW VAL, CURCELL', newValue, curCellValue);
     switch (Object.prototype.toString.call(colDefs[col].filterEditValue)) {
       case '[object Function]':
         return colDefs[col].filterEditValue(newValue, curCellValue, curRow);
@@ -165,7 +163,6 @@ const MyReactCell = (props) => {
               cellValue,
               row
             );
-            console.log('SANITIZED: ', sanitizedInnerText);
             // eslint-disable-next-line no-case-declarations
             const cellPrevValue = cellValue;
             updatePageDataWithCell(sanitizedInnerText, col, y);
@@ -178,7 +175,6 @@ const MyReactCell = (props) => {
               const dataToSend = { operation: 'edit', data: operData };
               serverUpdate(dataToSend, colDefs, serverSideEdit)
                 .then((updRow) => {
-                  console.log('RETURNED ROW', updRow);
                   updatePageDataWithRow(updRow, y);
                   fnUpdateDataOnEditWithoutRender(updRow);
                   setModalWarningActive(false);

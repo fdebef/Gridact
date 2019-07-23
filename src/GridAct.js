@@ -301,13 +301,10 @@ const GridAct = (props) => {
       .map(rw => rw[primaryKey])
       .indexOf(newRow[primaryKey]);
     tableData.current.splice(idxOfUpdatedRowInTableData, 1, newRow);
-    console.log('......................updating without render');
     setFilteredData((prev) => {
       const p = prev.slice()
-      console.log('PREV FILT DATA', p)
       const idxOfPrevFilterData = p.map(rw => rw[primaryKey]).indexOf(newRow[primaryKey]);
       p.splice(idxOfPrevFilterData, 1, newRow);
-      console.log('CHANGED FILT DATA: ', p)
       return p;
     });
   };
@@ -423,7 +420,6 @@ const GridAct = (props) => {
     delData[primaryKey] = pageData[activeCell.current[1]][primaryKey];
     serverSideEdit({ operation: 'delete', data: delData })
       .then((rs) => {
-        console.log('RETURNED FROM SERVER: ', rs);
         let parsedRes;
         if (typeof rs === 'string') {
           try {
@@ -440,7 +436,6 @@ const GridAct = (props) => {
             throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
           }
         } else throw Error('Not a valid JSON string nor JSON object');
-        console.log('PARSED RES: ', parsedRes);
         if (!parsedRes.error) {
           if (parsedRes.data > 0) {
             // Modify data2 - remove deletedRow
@@ -453,13 +448,11 @@ const GridAct = (props) => {
               .map(rw => rw[primaryKey])
               .indexOf(delData[primaryKey]);
             tableData.current.splice(idxOfDeletedRowTableData, 1);
-            console.log('new table data', tableData);
             // calculate new pageActual - you can delete last item on page
             const allPages = Math.ceil(
               tableData.current.length / pageLength.current
             );
             if (allPages < pageActual.current) {
-              console.log('LAST ITEM OF LAST PAGE');
               // last item of last page was deleted => totalPages < pageActual
               // we have to set last page of new dataSet (shorter of delete line)
               // set new position for cursor focus
@@ -467,13 +460,6 @@ const GridAct = (props) => {
                 activeCell.current[0],
                 pageLength.current - 1
               ];
-              console.log(
-                'actualPage: ',
-                pageActual.current,
-                'allPages: ',
-                allPages
-              );
-              console.log('ACTIVE CELL AFTER CHANGE: ', activeCell.current);
               pageActual.current = allPages;
               setPageData(
                 tableData.current.slice(
@@ -482,7 +468,6 @@ const GridAct = (props) => {
                 )
               );
             } else {
-              console.log('NOT LAST ITEM ON PAGE');
               setPageData(
                 tableData.current.slice(
                   (pageActual.current - 1) * pageLength.current,
@@ -491,10 +476,8 @@ const GridAct = (props) => {
               );
             }
           } else {
-            console.log('NO ROW REMOVED');
           }
         } else {
-          console.log('ERROR ON DATA DELETE: ', parsedRes.error);
         }
       })
       .catch((err) => {

@@ -44,6 +44,11 @@ in JavaScript and that's a big thanks to _Allan Jardine_. This motivated me to c
 **This is my first public React Component, I'll be really glad for any feedback and I'll do my best 
 to satisfy any of your requests. Thanks.**
 
+##Contact
+**[Twitter](https://twitter.com/FilipDebef)**<br>
+**[Facebook](https://www.facebook.com/profile.php?id=100009833865836)**
+
+
 # Installation #
 Nothing but easy.<br>
 `npm i gridact`<br>
@@ -53,8 +58,8 @@ react
 react-dom
 mdi-react
 ```
-These modules must be installed in parent component. Bootstrap must be imported in whichever parent component.<br>
-~~bootstrap~~ removed in version 0.6.0
+These modules must be installed in parent component. ~~Bootstrap must be imported in whichever parent component~~.
+(Bootstrap removed in version 0.6.0)
 
 **For proper function of error messages, append** `<div id="modalEl"></div>` to your `body` of `index.html`.  
 
