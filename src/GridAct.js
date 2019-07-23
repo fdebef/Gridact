@@ -11,7 +11,6 @@ import TableRowRemoveIcon from 'mdi-react/TableRowRemoveIcon';
 import FileDocumentBoxesOutlineIcon from 'mdi-react/FileDocumentBoxesOutlineIcon';
 import './styling.css';
 import DataTable from './DataTable';
-import TransferContext from '../context/TransferContext';
 
 //-----------------------------------------------------
 // Subcomponents for main component
