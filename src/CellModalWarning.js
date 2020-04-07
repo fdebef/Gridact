@@ -37,7 +37,9 @@ const CellModalWarning = ({
     >
       {children}
     </div>
-  ); const modEl = document.createElement('div');
+  );
+
+  const modEl = document.createElement('div');
   modEl.id = 'cellModalEl';
   document.body.appendChild(modEl);
   return (

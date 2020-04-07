@@ -1,7 +1,4 @@
 import React from 'react';
-import UnfoldMoreHorizontalIcon from 'mdi-react/UnfoldMoreHorizontalIcon';
-import ChevronUpIcon from 'mdi-react/ChevronUpIcon';
-import ChevronDownIcon from 'mdi-react/ChevronDownIcon';
 import MyReactRow from './MyReactRow';
 import TableHead from './TableHead';
 
@@ -26,7 +23,7 @@ const DataTable = (props) => {
     wrapperDivClass,
     onEnterMoveDown,
     tableCellClass,
-    setPageData,
+    setPageData
   } = props;
 
   // --------------------------------------------------------------------------
@@ -50,35 +47,35 @@ const DataTable = (props) => {
   const fnNavigation = (keyCode) => {
     let [calcX, calcY] = fnGetActiveCell();
     const [xCount, yCount] = colRowsCount; // number of columns and rows
-    if (keyCode === 913) {
-      onEnterMoveDown ? (keyCode = 40) : (keyCode = 39);
+    if (keyCode === 'move_next') {
+      onEnterMoveDown ? (keyCode = 'ArrowDown') : (keyCode = 'ArrowRight');
     }
     switch (keyCode) {
-      case 38: // up
+      case 'ArrowUp': // up
         calcY = calcY - 1 > 0 ? calcY - 1 : 0;
         break;
-      case 40: // down
+      case 'ArrowDown': // down
         calcY = calcY + 1 < yCount - 1 ? calcY + 1 : yCount - 1;
         break;
-      case 37: // left
+      case 'ArrowLeft': // left
         calcX = calcX - 1 > 0 ? calcX - 1 : 0;
         break;
-      case 39: // right
+      case 'ArrowRight': // right
         calcX = calcX + 1 < xCount - 1 ? calcX + 1 : xCount - 1;
         break;
-      case 9: // right (TAB)
+      case 'Tab': // right (TAB)
         calcX = calcX + 1 < xCount - 1 ? calcX + 1 : xCount - 1;
         break;
-      case 33: // pgUp
+      case 'PageUp': // pgUp
         calcY = 0;
         break;
-      case 34: // pgDn
+      case 'PageDown': // pgDn
         calcY = yCount - 1;
         break;
-      case 36: // Home
+      case 'Home': // Home
         calcX = 0;
         break;
-      case 35: // End
+      case 'End': // End
         calcX = xCount - 1;
         break;
       default:
@@ -122,12 +119,15 @@ const DataTable = (props) => {
 
   if (pageData.length) {
     return (
-      <div className={wrpClass(wrapperDivClass)}>
-        <table role="grid" className={tblClass(tableClasses)} style={{ cursor: 'default' }}>
+      <div className={wrpClass(wrapperDivClass)} style={{ display: 'inline-block', height: '100%',overflow: 'auto' }}>
+        <table
+          role="grid"
+          className={tblClass(tableClasses)}
+          style={{ cursor: 'default' }}
+        >
           <TableHead
             colDefs={colDefs}
             widthStyle={widthStyle}
-            tableCellClass={tableCellClass}
             sortTable={sortTable}
             sortState={sortState}
           />
@@ -157,6 +157,6 @@ const DataTable = (props) => {
       </div>
     );
   }
-  return <div className="display-inline align-center">No data received</div>;
+  return <div className="display-inline align-center" style={{ marginTop: '20px' }}>Žádná data k zobrazení.</div>;
 };
 export default React.memo(DataTable);

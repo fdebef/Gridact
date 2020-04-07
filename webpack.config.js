@@ -18,44 +18,24 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader',
-        options: { presets: ['@babel/env'] }
+        options: {presets: ['@babel/env']}
       }, {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
-      }, {
-        test: /\.scss$/,
-        use: [{
-          loader: 'style-loader' // creates style nodes from JS strings
-        },
-        {
-          loader: 'css-loader' // translates CSS into CommonJS
-        },
-        {
-          loader: 'postcss-loader', // Run post css actions
-          options: {
-            plugins() { // post css plugins, can be exported to postcss.config.js
-              return [
-                require('precss'),
-                require('autoprefixer')
-              ];
-            }
-          }
-        },
-        {
-          loader: 'sass-loader' // compiles Sass to CSS
-        }
-        ]
       },
-    ]
+      {
+        test: /\.(svg)$/,
+        use: ['@svgr/webpack', require.resolve('url-loader')]
+      }]
   },
   resolve: {
     extensions: ['*', '.js', '.jsx']
   },
-    externals: {
-      "react": "react",
-      "react-dom": "react-dom",
-      "mdi-react": "mdi-react"
-    },
+  externals: {
+    "react": "react",
+    "react-dom": "react-dom",
+    "mdi-react": "mdi-react"
+  },
 };
 
 //

@@ -24,18 +24,29 @@ Gridact is React component for displaying large datasets in table supporting
 
 ##**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
 
-##Changelog 1.0.0
-- First production version is here!
+
+##Changelog 2.1.0
+- _editable_ option in column definitions can now be function (e.g. you want to edit only if some condition is met)
+- enhanced sorting, corrected sort of empty (null) values
+- title option now available in columns definition
+
+##Changelog 2.0.0
 - Further optimized re-render evaluation on row (propsAreEqual.js)
 - Code readability improved 
 - Access to filtered rows, so you can e.g. calculate total sums to your table header (look at setFilteredData prop)
  
+##Changelog 1.0.0
+- Many small bugs fixed
+- Changed Icons to Font Awesome
+- initial sort (initSort) now possible
+- mainTableContainerClass for styling whole table container 
+
 ## GridAct
 
 I have done my best to optimize rendering, so the work is for user very good with rendering displayed table
 with 2000 cells (100 rows with 20 columns) in ~200 ms or 10000 cells in ~800 ms. (Change page to page render time.) 
 Render speed is not very much affected with total size of data, but with data displayed. For user experience
-I recommend not to allow page longer then 100 rows with 20 column table.  
+I recommend not to allow page longer then 100 rows with 20 columns table.  
 
 Gridact component is result of my experience working with Microsoft Excel as an user and
 [jQuery DataTables](https://datatables.net/) as developer. Datatables taught me to love data 
@@ -45,19 +56,14 @@ in JavaScript and that's a big thanks to _Allan Jardine_. This motivated me to c
 to satisfy any of your requests. Thanks.**
 
 ##Contact
-**[Twitter](https://twitter.com/FilipDebef)**<br>
-**[Facebook](https://www.facebook.com/profile.php?id=100009833865836)**
+Email me at filip (a) debef . com <br>
+**[Send me a Messenger message](https://m.me/filip.debef.9)**
 
 
 # Installation #
 Nothing but easy.<br>
 `npm i gridact`<br>
-Prerequsities:<br>
-```
-react
-react-dom
-mdi-react
-```
+
 These modules must be installed in parent component. ~~Bootstrap must be imported in whichever parent component~~.
 (Bootstrap removed in version 0.6.0)
 
@@ -120,6 +126,10 @@ Type: _Array | String_ _\<option>_<br>
 Props is joined to final classNames `classNames=wrapperDivClass.join(' ')`<br>
 Best use with boostrap's table classes. E.g. ```['table', 'table-sm', 'table-striped', 'text-nowrap', 'table-bordered']```
 
+### mainTableContainerClass ###
+Type: _String<option>_<br>
+Main container class, in this container is wrapped table and all controll items. (Paging, search,...)
+
 ###tableCellClass ###
 Type: _String_ _\<option>_<br>
 Easy cell styling, changes style of `th` and `td` cells in table.
@@ -157,6 +167,10 @@ Used e.g. for coloring cells based on row data.
 Type: String **\<mandatory\>**<br>
 Key from colDefs, where data primary key is stored. Is necessary for proper function of component.
 primaryKey must be included in colDefs, but you can hide it (hidden property)
+
+### initSort ###
+Type: _Object \<option>_<br>
+Initial sort of table in object {col: _colName_, dir: _'asc' | 'desc'_ }
 
 ### serverSideEdit ###
 AcceptedValues: _function_ **\<mandatory\> if editable columns** <br>
@@ -243,14 +257,24 @@ Name of column in table header
 Type: integer _\<option>_<br>
 Set width of current column. Default `<td>` css style is `overflow: hidden`.
 
-### editable, sortable ###
-Type: Boolean
-Column cells will be editable and sortable.
-  
+### editable ###
+Type: _Boolean | Function`(cellValue, rowData)` \<option>_<br>
+Column cells will be editable. If value is not Boolean or Function, it is evaluated as Boolean(providedValue) 
+ 
+### sortable ###
+Type: _Boolean \<option>_<br>
+Column cells will be sortable. If 
+ 
 ### hidden ###
 Type: Boolean _\<option>_<br>
 Column will be hidden. Usefull when you want to calculate cell value from multiple columns or style cell based on data
 from other columns but the other columns you do not want to show.
+
+### title ###
+Type: _Boolean | Function`(cellValue, rowData)` \<option>_<br>
+Title (small hint over cell), e.g. when not whole content is visible, or when you want to comment the cell content.
+Default is false, when set to `True`, the content of cell is used.
+
 
 ### cellClass ###
 Type: _String | Array | function_ _\<option>_<br>

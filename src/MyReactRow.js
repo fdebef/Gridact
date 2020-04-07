@@ -24,21 +24,28 @@ const MyReactRow = (props) => {
   // --------------------------------------------------------------------------
   // Calculate rowClassNames, based on rowClass parameter
   // tightly controlled on data types
+
   const rowClassNames = (rwDt) => {
-    if (!fnRowClass) return undefined;
-    if (typeof fnRowClass === 'string') return fnRowClass;
-    if (Array.isArray(fnRowClass)) return fnRowClass.join(' ');
-    if (typeof fnRowClass === 'function') {
-      const calcClass = fnRowClass(rwDt);
-      if (!calcClass) return undefined;
-      if (typeof calcClass === 'string') return calcClass;
-      if (Array.isArray(calcClass)) return calcClass.join(' ');
+    switch (Object.prototype.toString.call(fnRowClass)) {
+      case '[object Function]':
+        return fnRowClass(rwDt);
+      case '[object String]':
+        return fnRowClass;
+      case '[object Array]':
+        return fnRowClass.join(' ');
+      case '[object Undefined]':
+        return null;
+      default:
+        return null;
     }
-    return undefined;
   };
 
   return (
-    <tr className={rowClassNames(row)} key={y}>
+    <tr
+      className={rowClassNames(row)}
+      key={y}
+      tabIndex={0}
+    >
       {Object.keys(colDefs)
         .filter(cD => !colDefs[cD].hidden && colDefs[cD].tableHead)
         .map((col, x) => (
@@ -48,7 +55,10 @@ const MyReactRow = (props) => {
             col={col}
             x={x}
             y={y}
-            cellValue={row[col]}
+            cellValue={(() => {
+              if (Object.keys(row).includes(col)) return row[col];
+              return null;
+            })()}
             fnUpdateRefStore={fnUpdateRefStore}
             fnSetActiveCell={fnSetActiveCell}
             colDefs={colDefs}
@@ -67,7 +77,7 @@ const MyReactRow = (props) => {
 };
 
 export default React.memo(MyReactRow, (prev, act) => {
-  if (propsAreEqual(prev.row, act.row)) {
+  if (propsAreEqual(prev.row, act.row) && propsAreEqual(prev.colDefs, act.colDefs)) {
     return true;
   }
   return propsAreEqual(prev, act);

@@ -17,7 +17,9 @@ const propsAreEqual = (prev, act) => {
         return true;
       case '[object Array]':
         // first must be same length
-        if (prev.length !== act.length) return false;
+        if (prev.length !== act.length) {
+          return false;
+        }
         // further compare all items in Array, order is important
         // eslint-disable-next-line no-case-declarations
         const arrComp = prev.map((p, i) => propsAreEqual(p, act[i]));
@@ -33,7 +35,7 @@ const propsAreEqual = (prev, act) => {
         }
         return false;
       case '[object Function]':
-        return prev.toString === act.toString;
+        return prev.toString() === act.toString();
       default:
         return false;
     }

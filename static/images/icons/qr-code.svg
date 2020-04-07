@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<g>
+	<g>
+		<g>
+			<rect x="64" y="64" width="64" height="64"/>
+			<path d="M192,0H0v192h192V0z M160,160H32V32h128V160z"/>
+			<rect x="384" y="64" width="64" height="64"/>
+			<path d="M320,0v192h192V0H320z M480,160H352V32h128V160z"/>
+			<rect x="64" y="384" width="64" height="64"/>
+			<path d="M0.031,512H192V320H0.031V512z M32.031,352h128v128.031h-128V352z"/>
+			<polygon points="256.031,352 224,352 224,384 256.031,384 256.031,448 288.031,448 288.031,320 256.031,320 			"/>
+			<path d="M448,319.969h-32.031v32H448V416h-32.031v-64.031H352V288h32v31.969h31.969V288H448v-32h-32.031v-32H384v32h-32v-32h-64
+				v-64h-32v32h-32v32h32v64h64v160h32v32h-32v32h64v-32h31.969v-32H448v32h-28.001v32H512v-64h-32v-64h32v-32.031h-32V288h-32
+				V319.969z M384,416h-32v-32h32V416z"/>
+			<polygon points="288,96 288,0 224,0 224,32 256,32 256,64 224,64 224,160 256,160 256,96 			"/>
+			<polygon points="160,256 128.031,256 128.031,224 96.031,224 96.031,256 128,256 128,288 192,288 192,256 224,256 224,224 
+				160,224 			"/>
+			<polygon points="448,256 480,256 480,288 512,288 512,224 448,224 			"/>
+			<rect x="224" y="288" width="32" height="32"/>
+			<rect x="224" y="448" width="32" height="32"/>
+			<rect x="256" y="480" width="32" height="32"/>
+			<polygon points="96,256 64,256 64,224 0,224 0,288 96,288 			"/>
+		</g>
+	</g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+</svg>

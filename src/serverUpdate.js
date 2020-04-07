@@ -26,7 +26,7 @@ const serverUpdate = (dataToSend, colDefs, serverSideEdit) => new Promise((resol
     })
     .catch((err) => {
       console.log('API ERROR: ', err);
-      reject(`API ERROR${JSON.stringify(err)}`);
+      reject(`API ERROR: ${JSON.stringify(err)}`);
     });
 });
 

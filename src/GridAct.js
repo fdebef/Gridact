@@ -1,26 +1,28 @@
-import React, {
-  useState, useRef, useEffect, useContext
-} from 'react';
-import ChevronLeftIcon from 'mdi-react/ChevronLeftIcon';
-import ChevronDoubleLeftIcon from 'mdi-react/ChevronDoubleLeftIcon';
-import ChevronDoubleRightIcon from 'mdi-react/ChevronDoubleRightIcon';
-import ChevronRightIcon from 'mdi-react/ChevronRightIcon';
-import TableSearchIcon from 'mdi-react/TableSearchIcon';
-import TableRowAddBeforeIcon from 'mdi-react/TableRowAddBeforeIcon';
-import TableRowRemoveIcon from 'mdi-react/TableRowRemoveIcon';
-import FileDocumentBoxesOutlineIcon from 'mdi-react/FileDocumentBoxesOutlineIcon';
+import React, { useEffect, useRef, useState } from 'react';
+import { ReactComponent as AddRow } from '../static/images/icons/addRow.svg';
+import { ReactComponent as DeleteRow } from '../static/images/icons/deleteRow.svg';
+import { ReactComponent as MultiPages } from '../static/images/icons/paging.svg';
+import { ReactComponent as PlayLeft } from '../static/images/icons/playLeft.svg';
+import { ReactComponent as PlayRight } from '../static/images/icons/playRight.svg';
+import { ReactComponent as PlayEndLeft } from '../static/images/icons/playEndLeft.svg';
+import { ReactComponent as PlayEndRight } from '../static/images/icons/playEndRight.svg';
+import { ReactComponent as SearchIcon } from '../static/images/icons/searchIcon.svg';
 import './styling.css';
 import DataTable from './DataTable';
 
 //-----------------------------------------------------
 // Subcomponents for main component
 
+
 const PagingSelector = (props) => {
   const { pageLength, changePageLength, pagingOptions } = props;
   return (
     <>
       <span key="17" className="FFInputDesc">
-        <FileDocumentBoxesOutlineIcon />
+        <MultiPages style={{
+          fill: 'var(--crxblue)', height: '25px', width: '25px', marginTop: '2px'
+        }}
+        />
       </span>
 
       <select
@@ -53,8 +55,8 @@ const PageSelector = (props) => {
         className="forward paging-font"
         onClick={() => changePage('first')}
       >
-        {1}
-        <ChevronDoubleLeftIcon key="2" />
+        <span style={{ marginRight: '5px' }}>{1}</span>
+        <PlayEndLeft className="hand" style={{ fill: 'dodgerblue', height: '20px', width: '20px' }} />
       </button>
       <button
         key="3"
@@ -62,7 +64,7 @@ const PageSelector = (props) => {
         className="forward paging-font"
         onClick={() => changePage('-1')}
       >
-        <ChevronLeftIcon key="4" />
+        <PlayLeft className="hand" style={{ fill: 'dodgerblue', height: '20px', width: '20px' }} />
       </button>
       <span key="5" className="paging-font">
         {pageActual}
@@ -73,7 +75,7 @@ const PageSelector = (props) => {
         className="forward paging-font"
         onClick={() => changePage('+1')}
       >
-        <ChevronRightIcon key="7" />
+        <PlayRight className="hand" style={{ fill: 'dodgerblue', height: '20px', width: '20px' }} />
       </button>
       <button
         key="8"
@@ -81,8 +83,8 @@ const PageSelector = (props) => {
         className="forward paging-font"
         onClick={() => changePage('last')}
       >
-        <ChevronDoubleRightIcon key="9" />
-        {Math.ceil(tableDataLength / pageLength)}
+        <PlayEndRight className="hand" style={{ fill: 'dodgerblue', height: '20px', width: '20px' }} />
+        <span style={{ marginLeft: '5px' }}>{Math.ceil(tableDataLength / pageLength)}</span>
       </button>
       <span className="paging-font">{` (${tableDataLength})`}</span>
     </div>
@@ -96,20 +98,30 @@ const AddRemoveButtons = (props) => {
       <button
         key="20"
         type="button"
-        title="Add new row..."
+        title="Přidat nový řádek..."
         onClick={addRow}
         className="add"
       >
-        <TableRowAddBeforeIcon />
+        <AddRow
+          className="hand"
+          style={{
+            fill: 'white', height: '22px', width: '22px', marginTop: '6px'
+          }}
+        />
       </button>
       <button
         key="21"
         type="button"
-        title="Remove row with cursor..."
+        title="Vymazat řádek, na kterém stojí kurzor"
         onClick={removeRow}
         className="ml-2 remove"
       >
-        <TableRowRemoveIcon />
+        <DeleteRow
+          className="hand"
+          style={{
+            fill: 'white', height: '22px', width: '22px', marginTop: '6px'
+          }}
+        />
       </button>
     </div>
   );
@@ -135,13 +147,15 @@ const GridAct = (props) => {
     searchPlaceHolder,
     onEnterMoveDown,
     tableCellClass,
-    setFilteredData
+    setFilteredData,
+    initSort,
+    mainTableContainerClass
   } = props;
   const [pageData, setPageData] = useState([]);
   const pageActual = useRef(1);
   const pageLength = useRef(pagingOptions[0] || 10);
   const tableFilterValue = useRef('');
-  const sortState = useRef({ col: undefined, dir: undefined });
+  const sortState = useRef(initSort || { col: undefined, dir: undefined });
 
   // --------------------------------------------------------------------------
   // On first data load we create:
@@ -178,15 +192,35 @@ const GridAct = (props) => {
     if (data) {
       if (data.length) {
         data2.current = data.slice();
+        if (sortState.current.dir === 'desc') {
+          tableData.current = data.slice().sort((a, b) => {
+            if ((a[sortState.current.col] || 0) < (b[sortState.current.col] || 0)) return 1;
+            if ((a[sortState.current.col] || 0) > (b[sortState.current.col] || 0)) return -1;
+            return 0;
+          });
+        } else if (sortState.current.dir === 'asc') {
+          tableData.current = data.slice().sort((a, b) => {
+            if ((a[sortState.current.col] || 0) < (b[sortState.current.col] || 0)) return -1;
+            if ((a[sortState.current.col] || 0) > (b[sortState.current.col] || 0)) return 1;
+            return 0;
+          });
+        } else {
+          tableData.current = data.slice();
+        }
+      } else {
         tableData.current = data.slice();
-        tableFilterValue.current = '';
-        sortState.current = { col: undefined, dir: undefined };
-        pageActual.current = 1;
-        // setPageLength not necessary, only to keep exhaustive-deps lint rule
-        setPageData(tableData.current.slice(0, pageLength.current));
+        activeCell.current = [undefined, undefined];
       }
     }
-  }, [data]);
+    tableFilterValue.current = '';
+    // sortState.current = { col: undefined, dir: undefined };
+    pageActual.current = 1;
+    // setPageLength not necessary, only to keep exhaustive-deps lint rule
+    setPageData(tableData.current.slice(0, pageLength.current));
+    if (Object.prototype.toString.call(setFilteredData) === '[object Function]' && tableData.current.length) {
+      setFilteredData(tableData.current);
+    }
+  }, [data, setFilteredData]);
 
   useEffect(() => {
     if (
@@ -199,7 +233,7 @@ const GridAct = (props) => {
     } else if (activeCell.current[0] >= 0 && activeCell.current[1] >= 0) {
       fnGetRef(activeCell.current[0], activeCell.current[1]).focus();
     }
-  });
+  }, [pageData]);
 
   // --------------------------------------------------------------------------
   // On pageChange we first calculate new page (check if less then 1st and
@@ -212,7 +246,7 @@ const GridAct = (props) => {
         break;
       case '+1':
         newPage = pageActual.current + 1
-          > Math.ceil(tableData.current.length / pageLength.current)
+        > Math.ceil(tableData.current.length / pageLength.current)
           ? Math.ceil(tableData.current.length / pageLength.current)
           : pageActual.current + 1;
         break;
@@ -301,12 +335,14 @@ const GridAct = (props) => {
       .map(rw => rw[primaryKey])
       .indexOf(newRow[primaryKey]);
     tableData.current.splice(idxOfUpdatedRowInTableData, 1, newRow);
-    setFilteredData((prev) => {
-      const p = prev.slice()
-      const idxOfPrevFilterData = p.map(rw => rw[primaryKey]).indexOf(newRow[primaryKey]);
-      p.splice(idxOfPrevFilterData, 1, newRow);
-      return p;
-    });
+    if (Object.prototype.toString.call(setFilteredData) === '[object Function]') {
+      setFilteredData((prev) => {
+        const p = prev.slice();
+        const idxOfPrevFilterData = p.map(rw => rw[primaryKey]).indexOf(newRow[primaryKey]);
+        p.splice(idxOfPrevFilterData, 1, newRow);
+        return p;
+      });
+    }
   };
 
   // --------------------------------------------------------------------------
@@ -323,9 +359,11 @@ const GridAct = (props) => {
     switch (true) {
       case sortState.current.col === col && sortState.current.dir === 'asc':
         sortedData = tableData.current.slice().sort((a, b) => {
-          if (a[col] > b[col]) return -1;
-          if (a[col] < b[col]) return 1;
-          return 0;
+          if (a[col] === b[col]) return 0;
+          if (a[col] === null) return 1;
+          if (b[col] === null) return -1;
+          if ((a[col] || 0) < (b[col] || 0)) return 1;
+          if ((a[col] || 0) > (b[col] || 0)) return -1;
         });
         tableData.current = sortedData;
         sortState.current = { col, dir: 'desc' };
@@ -339,7 +377,7 @@ const GridAct = (props) => {
       case sortState.current.col === col && sortState.current.dir === 'desc':
         sortedData = data2.current.slice();
         if (tableFilterValue.current.length) {
-          // have to setup applied table filter
+          // have to setup applied table filter, because original sort is taken from original data
           const testGroups = String(tableFilterValue.current).match(/(\S+)/g);
           sortedData = data2.current.filter(row => Object.keys(row).some((c) => {
             if (row[c]) {
@@ -363,8 +401,11 @@ const GridAct = (props) => {
       default:
         // first click => sort asc
         sortedData = tableData.current.slice().sort((a, b) => {
-          if (a[col] < b[col]) return -1;
-          if (a[col] > b[col]) return 1;
+          if (a[col] === b[col]) return 0;
+          if (a[col] === null) return -1;
+          if (b[col] === null) return 1;
+          if ((a[col] || 0) < (b[col] || 0)) return -1;
+          if ((a[col] || 0) > (b[col] || 0)) return 1;
           return 0;
         });
         tableData.current = sortedData;
@@ -382,6 +423,7 @@ const GridAct = (props) => {
     tableData.current = data2.current;
     serverSideEdit({ operation: 'new' })
       .then((rs) => {
+        console.log('THIS IS FROM SERVER: ', rs);
         let parsedRes;
         if (typeof rs === 'string') {
           try {
@@ -398,7 +440,7 @@ const GridAct = (props) => {
             throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
           }
         } else throw Error('Not a valid JSON string nor JSON object');
-
+        console.log('PARSED RES: ', parsedRes);
         data2.current.unshift(parsedRes.data);
         tableData.current = data2.current.slice();
         // pageData.current.unshift(nR);
@@ -415,7 +457,7 @@ const GridAct = (props) => {
 
   const removeRow = () => {
     // prepare deleted data with primaryKey
-    if (!(activeCell.current[0] >= 0) || !(activeCell.current[1] >= 0)) return null;
+    if (!(activeCell.current[0] >= 0) || !(activeCell.current[1] >= 0) || !addRemove) return null;
     const delData = {};
     delData[primaryKey] = pageData[activeCell.current[1]][primaryKey];
     serverSideEdit({ operation: 'delete', data: delData })
@@ -436,8 +478,9 @@ const GridAct = (props) => {
             throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
           }
         } else throw Error('Not a valid JSON string nor JSON object');
+        console.log('RESPONSE: ', parsedRes);
         if (!parsedRes.error) {
-          if (parsedRes.data > 0) {
+          if (parsedRes.data === 1) {
             // Modify data2 - remove deletedRow
             const idxOfDeletedRow = data2.current
               .map(rw => rw[primaryKey])
@@ -452,7 +495,11 @@ const GridAct = (props) => {
             const allPages = Math.ceil(
               tableData.current.length / pageLength.current
             );
-            if (allPages < pageActual.current) {
+            if (!data2.current.length) {
+              setPageData([]);
+              pageActual.current = 0;
+              activeCell.current = [undefined, undefined];
+            } else if (allPages < pageActual.current) {
               // last item of last page was deleted => totalPages < pageActual
               // we have to set last page of new dataSet (shorter of delete line)
               // set new position for cursor focus
@@ -476,6 +523,7 @@ const GridAct = (props) => {
               );
             }
           } else {
+            // TODO: add modal error
           }
         } else {
         }
@@ -485,56 +533,68 @@ const GridAct = (props) => {
       });
   };
 
+  const mainTableContainerStyle = () => {
+    if (showFilter || addRemove || pagingSelector || pageSelector) return { height: '100%' };
+    return {
+      height: '100%',
+      gridTemplateRows: '1fr'
+    };
+  };
+
   return (
-    <div className="main-table-container">
-      <div className="table-control">
-        {showFilter && (
-          <div className="search-control display-inline">
-            <span className="FFInputDesc">
-              <TableSearchIcon />
-            </span>
-            <input
-              className="FFInputField paging-font"
-              style={{ width: '200px' }}
-              key="myinputfield"
-              type="text"
-              onFocus={e => fnSetActiveCell([undefined, undefined])}
-              placeholder={searchPlaceHolder}
-              value={tableFilterValue.current}
-              onChange={fnChangeTableFilter}
-              ref={inputFieldRef}
-            />
-          </div>
-        )}
-        {addRemove && (
-          <div className="add-remove-control display-inline">
-            <AddRemoveButtons
-              addRow={addRow}
-              removeRow={removeRow}
-              addRemove={addRemove}
-            />
-          </div>
-        )}
-        <div className="paging-control display-inline">
-          {pagingSelector && (
-            <PagingSelector
-              pageLength={pageLength.current}
-              changePageLength={changePageLength}
-              pagingOptions={pagingOptions}
-              key="10"
-            />
+    <div className={mainTableContainerClass || 'main-table-container'} style={mainTableContainerStyle()}>
+      {(showFilter || addRemove || pagingSelector || pageSelector)
+      && (
+        <div className="table-control">
+          {showFilter && (
+            <div className="display-inline">
+              <span className="FFInputDesc">
+                <SearchIcon style={{ fill: 'var(--crxblue)', width: '25px', height: '25px' }} />
+              </span>
+              <input
+                className="FFInputField paging-font"
+                style={{ width: '200px' }}
+                key="myinputfield"
+                type="text"
+                onFocus={e => fnSetActiveCell([undefined, undefined])}
+                placeholder={searchPlaceHolder}
+                value={tableFilterValue.current}
+                onChange={fnChangeTableFilter}
+                ref={inputFieldRef}
+              />
+            </div>
           )}
-          {pageSelector && (
-            <PageSelector
-              changePage={changePage}
-              tableDataLength={tableData.current.length}
-              pageLength={pageLength.current}
-              pageActual={pageActual.current}
-              key="11"
-            />
-          )}
+          <div className="display-inline">
+            {addRemove && (
+              <AddRemoveButtons
+                addRow={addRow}
+                removeRow={removeRow}
+                addRemove={addRemove}
+              />
+            )}
+          </div>
+          <div className="display-inline">
+            {pagingSelector && (
+              <PagingSelector
+                pageLength={pageLength.current}
+                changePageLength={changePageLength}
+                pagingOptions={pagingOptions}
+                key="10"
+              />
+            )}
+            {pageSelector && (
+              <PageSelector
+                changePage={changePage}
+                tableDataLength={tableData.current.length}
+                pageLength={pageLength.current}
+                pageActual={pageActual.current}
+                key="11"
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )
+      }
 
       <DataTable
         key="13"

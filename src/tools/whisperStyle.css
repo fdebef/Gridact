@@ -1,0 +1,57 @@
+.whTable tbody tr td {
+    height: 25px
+}
+
+.whTable {
+    border: 1px solid rgba(0, 230, 0, 1);
+    background: rgba(230, 255, 230, 1);
+    font-size: 0.9em;
+    border-spacing: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.whTable tbody tr {
+    background: rgba(230, 255, 230, 1);
+}
+.whTable tbody tr td {
+    border: 1px solid rgba(0, 230, 0, 1);
+}
+
+.whTable tr.focused {
+    background: var(--crxpinklt) !important;
+    color: white;
+    outline: 0
+}
+
+.whTable tbody tr:nth-child(odd) {
+    background: rgba(1, 203, 87, 1) !important;
+}
+
+.whTable tbody tr.focused:nth-child(odd) {
+    background: var(--crxpinklt) !important;
+    color: white;
+    outline: 0
+}
+
+.whTable tbody:hover tr:hover {
+    background: var(--crxgreen) !important;
+}
+
+
+
+/*.noScrollBar::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    display: block;
+    background-color: #bbb;
+    outline: none
+}
+
+.noScrollBar::-webkit-scrollbar-thumb {
+    background-color: var(--crxpink)
+}
+
+.noScrollBar:focus {
+    outline: none
+}*/
