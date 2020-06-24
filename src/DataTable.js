@@ -23,7 +23,7 @@ const DataTable = (props) => {
     wrapperDivClass,
     onEnterMoveDown,
     tableCellClass,
-    setPageData
+    setPageData,
   } = props;
 
   // --------------------------------------------------------------------------
@@ -36,8 +36,8 @@ const DataTable = (props) => {
   let colRowsCount;
   if (pageData.length) {
     colRowsCount = [
-      Object.keys(colDefs).filter(k => !k.hidden).length,
-      pageData.length
+      Object.keys(colDefs).filter((k) => !k.hidden).length,
+      pageData.length,
     ];
   }
 
@@ -92,9 +92,9 @@ const DataTable = (props) => {
       case '[object String]':
         return wrpProp;
       case '[object Undefined]':
-        return undefined;
+        return 'defaultTableWrapper';
       default:
-        return undefined;
+        return 'defaultTableWrapper';
     }
   };
 
@@ -105,9 +105,9 @@ const DataTable = (props) => {
       case '[object String]':
         return tblClsProp;
       case '[object Undefined]':
-        return undefined;
+        return 'defaultTableStyle';
       default:
-        return undefined;
+        return 'defaultTableStyle';
     }
   };
 
@@ -119,7 +119,7 @@ const DataTable = (props) => {
 
   if (pageData.length) {
     return (
-      <div className={wrpClass(wrapperDivClass)} style={{ display: 'inline-block', height: '100%',overflow: 'auto' }}>
+      <div className={wrpClass(wrapperDivClass)} style={{}}>
         <table
           role="grid"
           className={tblClass(tableClasses)}
@@ -157,6 +157,15 @@ const DataTable = (props) => {
       </div>
     );
   }
-  return <div className="display-inline align-center" style={{ marginTop: '20px' }}>Žádná data k zobrazení.</div>;
+  return (
+    <div className={wrpClass(wrapperDivClass)} style={{}}>
+      <div
+        className="display-inline align-center"
+        style={{ marginTop: '20px' }}
+      >
+        Žádná data k zobrazení.
+      </div>
+    </div>
+  );
 };
 export default React.memo(DataTable);

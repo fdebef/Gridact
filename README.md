@@ -25,6 +25,11 @@ Gridact is React component for displaying large datasets in table supporting
 ##**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
 
 
+##Changelog 2.5.0
+- new format of data from edit, simplier `{newValue, column, row}` From Row you can find whatever identification you need.
+##TODO: describe in manual!!!!!!!!!!!!!!!!!!!!!!!!!!
+Remove primary_key - you do not need this anymore
+
 ##Changelog 2.1.0
 - _editable_ option in column definitions can now be function (e.g. you want to edit only if some condition is met)
 - enhanced sorting, corrected sort of empty (null) values
@@ -179,22 +184,28 @@ Function is provided with Object according to selected operation.<br>
 #### Objects passed to function are based on operation  ###
 **edit**<br>
 Cell edit<br>
-Passed argument: `{operation: 'edit', data: {primary_key: val, column_name: new_value}}`<br>
-Required response: Promise resolved with `{data: updatedRow}` <br>
+Passed argument: `{operation: 'edit', newValue: {[editedColumn]: [newValue]}, row: [rowData]}}`<br>
+Required response: Promise resolved with `{data: [updatedRow]}` <br>
 If you want to validate data server-side, you can response with `{error: errorMsg}`, where `errorMsg` is string,
-which will be displayd in small overlay next to edited cell. <br>
+which will be displayed in small overlay next to edited cell. <br>
 If `error` is in response, data will not be updated in table, previous value will be restored.   
 
 **new**<br>
 Add new row<br>
 Passed argument: `{operation: 'new'}`<br>
-Required response: Promise resolved with `{data: newRow}` In newRow, primary_key must not be `null`.  
+Required response: Promise resolved with `{data: [newRow]}` In newRow, primary_key must not be `null`.  
 
 **delete**<br>
 Delete row, where is focused cell.<br>
-Passed argument: `{operation: 'delete', data: {primary_key: val}}`<br>
+Passed argument: `{operation: 'delete', row: [rowData]}`<br>
 Required response: `{data: 1}`<br>
 If value of `data` key is < 1, row will not be deleted in table.
+
+**click**<br>
+You can choose for clicking on cell value and change it on click.
+Passed argument: `{operation: 'edit', newValue: {[editedColumn]: [oldValue]}, row: [rowData]}}`<br>
+You decide, how the value should change on click.
+Response should be `{data: [updatedRow]}`
 
 ### showFilter, addRemove, pageSelector, pagingSelector ###
 Type: _Boolean \<option>_<br>
@@ -221,6 +232,7 @@ colDefs is object, where keys are column codes, values are column definitions it
     name: 'ID',
     editable: false,
     // filterEditValue: function | regexp of chars to filter out (newValue.prototype.replace(regexp, '')
+    // function must return Boolean
     filterEditValue: (newValue, curCellValue, row) => (newValue.replace(/[{]|[}]|[<]|[>]|[\\]|[/]/g, '')),
     // filterEditValue: function which returns true to allow or false for disable char
     // regexp of chars allowed (newValue.prototype.match(regexp))

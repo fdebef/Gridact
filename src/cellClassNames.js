@@ -1,15 +1,14 @@
 const cellClassNames = (userClass, celVal, rwDt) => {
-  if (!userClass) return undefined;
-  if (typeof userClass === 'string') return userClass;
-  if (Array.isArray(userClass)) return userClass.join(' ');
-  if (typeof userClass === 'function') {
-    const calcClass = userClass(celVal, rwDt);
-    if (!calcClass) return undefined;
-    if (typeof calcClass === 'string') return calcClass;
-    if (Array.isArray(calcClass)) return calcClass.join(' ');
+  switch (Object.prototype.toString.call(userClass)) {
+    case '[object String]':
+      return userClass;
+    case '[object Function]':
+      return userClass(celVal, rwDt);
+    case '[object Array]':
+      return userClass.join(' ');
+    default:
+      return 'defaultCell';
   }
-  return undefined;
 };
-
 
 export default cellClassNames;

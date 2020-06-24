@@ -23,7 +23,7 @@ const propsAreEqual = (prev, act) => {
         // further compare all items in Array, order is important
         // eslint-disable-next-line no-case-declarations
         const arrComp = prev.map((p, i) => propsAreEqual(p, act[i]));
-        return arrComp.every(n => n);
+        return arrComp.every((n) => n);
       case '[object Object]':
         // if includes $$typeof >> is Component with circular, compare only props
         if (Object.keys(prev).includes('$$typeof')) {

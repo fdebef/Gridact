@@ -1,0 +1,127 @@
+
+.defaultTableWrapper {
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+
+/* .defaultTableWrapper div:after {
+    content: '---';
+    overflow: auto;
+} */
+
+.defaultTableStyle {
+    display: inline;
+    margin-bottom: 1rem;
+    color: #212529;
+    font-size: 0.9rem;
+    border-spacing: 0;
+}
+
+.defaultTableStyle thead th {
+    vertical-align: center;
+    height: 20px;
+    background-color: white;
+    border-left: 1px solid black !important;
+    border-top: 1px solid black !important;
+    border-bottom: 1px solid black !important;
+    position: sticky; /* fixed head */
+    top: 0;
+}
+
+.defaultTableStyle th:last-child {
+    border-right: 1px solid black !important;
+}
+
+.defaultTableStyle td {
+    padding: 0 5px 0 5px;
+    height: 1.6em;
+    border-left: 1px solid var(--mygreyborder);
+    border-top: 1px solid var(--mygreyborder);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap
+}
+
+.defaultTableStyle tr:last-child td {
+    border-bottom: 1px solid var(--mygreyborder);
+}
+
+.defaultTableStyle td:last-child {
+    border-right: 1px solid var(--mygreyborder);
+}
+
+.defaultTableStyle tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 1);
+}
+
+.defaultTableStyle tbody tr:nth-child(even) {
+    background: rgba(230, 230, 230, 1);
+}
+
+.defaultCell {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap
+}
+
+@keyframes cellFocus {
+    0% {
+        background-color: dodgerblue;
+    }
+    50% {
+        background-color: lime;
+    }
+    100% {
+        background-color: var(--crxgreen);
+    }
+}
+
+.defaultTableStyle td:focus {
+    background-color: var(--crxgreen) !important;
+    animation-name: cellFocus;
+    animation-duration: 300ms;
+    outline: none
+}
+
+@keyframes rowgeneration {
+    0% {
+        background-color: white;
+    }
+    50% {
+        background-color: lightskyblue;
+    }
+    100% {
+        background-color: white;
+    }
+}
+
+tr.flash {
+    background-color: white;
+    animation-name: rowgeneration;
+    animation-duration: 250ms;
+}
+
+.defaultTableWrapper::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+
+.defaultTableWrapper::-webkit-scrollbar-track {
+
+}
+
+
+.defaultTableWrapper::-webkit-scrollbar-thumb {
+    background: repeating-linear-gradient(
+            45deg,
+            var(--mybluelightbackground) 5px,
+            var(--mybluelightbackground) 10px,
+            var(--mygreyborder) 10px,
+            var(--mygreyborder) 15px);
+    border-radius: 2px;
+}
+
+.defaultTableWrapper::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: 26px
+}

@@ -12,8 +12,12 @@ const KEY_TAB = 9;
 const ROW_HEIGHT = 25;
 
 const WhispererTable = ({
-  whisperData, setWhisperData, inputRef, activeRow, setActiveRow,
-  setFinalData
+  whisperData,
+  setWhisperData,
+  inputRef,
+  activeRow,
+  setActiveRow,
+  setFinalData,
 }) => {
   const [whisperPos, setWhisperPos] = useState({ x: null, y: null, h: null });
   const [transY, setTransY] = useState(0);
@@ -27,11 +31,10 @@ const WhispererTable = ({
       setWhisperPos({
         x: inputRef.current.getBoundingClientRect().left,
         y: inputRef.current.getBoundingClientRect().top,
-        h: inputRef.current.getBoundingClientRect().height
+        h: inputRef.current.getBoundingClientRect().height,
       });
     }
   }, [inputRef]);
-
 
   useEffect(() => {
     if (activeRow != null) {
@@ -59,11 +62,11 @@ const WhispererTable = ({
     height: '376px',
     display: 'grid',
     gridTemplateColumns: 'auto',
-    zIndex: 1000
+    zIndex: 1000,
   };
 
   const handleClick = (e, i) => {
-    console.log('HANDLING CLICK: ', whisperData[i])
+    console.log('HANDLING CLICK: ', whisperData[i]);
     setFinalData(whisperData[i]);
     setWhisperData([]);
   };
@@ -76,18 +79,13 @@ const WhispererTable = ({
       ref={tableDivRef}
       onScroll={(r) => {
         scrollRef.current = tableDivRef.current.scrollTop;
-      }
-      }
+      }}
     >
-      <table
-        role="grid"
-        className="whTable"
-        ref={tableRef}
-      >
+      <table role="grid" className="whTable" ref={tableRef}>
         <tbody>
           {wd.map((rw, i) => (
             <tr
-              className={(i === activeRow) ? 'focused' : ''}
+              className={i === activeRow ? 'focused' : ''}
               key={Object.values(rw).join()}
               tabIndex={0}
               onClick={(e) => {
@@ -105,7 +103,7 @@ const WhispererTable = ({
                     paddingRight: '10px',
                     maxWidth: '300px',
                     overflow: 'hidden',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {v}
@@ -121,7 +119,7 @@ const WhispererTable = ({
   const whisperStyle = {
     positiwhon: 'absolute',
     left: whisperPos.x,
-    top: whisperPos.y
+    top: whisperPos.y,
   };
 
   // if (!document.getElementById('whisperEl')) {
@@ -132,9 +130,7 @@ const WhispererTable = ({
   // return whisperDiv, document.getElementById('whisperEl'));
 
   return (
-    <div
-      style={whisperStyle}
-    >
+    <div style={whisperStyle}>
       <WhTbl wd={whisperData} />
     </div>
   );

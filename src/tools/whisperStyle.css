@@ -1,21 +1,22 @@
 .whTable tbody tr td {
-    height: 25px
+    height: 20px;
+    font-weight: normal;
 }
 
 .whTable {
     border: 1px solid rgba(0, 230, 0, 1);
-    background: rgba(230, 255, 230, 1);
-    font-size: 0.9em;
+    background: rgb(206, 206, 206);
+    font-size: 0.8em;
     border-spacing: 0;
     border-collapse: collapse;
     table-layout: fixed;
 }
 
 .whTable tbody tr {
-    background: rgba(230, 255, 230, 1);
+    background: rgb(206, 206, 206);
 }
 .whTable tbody tr td {
-    border: 1px solid rgba(0, 230, 0, 1);
+    border: 1px solid rgb(134, 134, 134);
 }
 
 .whTable tr.focused {
@@ -25,7 +26,7 @@
 }
 
 .whTable tbody tr:nth-child(odd) {
-    background: rgba(1, 203, 87, 1) !important;
+    background: rgb(180, 180, 180) !important;
 }
 
 .whTable tbody tr.focused:nth-child(odd) {

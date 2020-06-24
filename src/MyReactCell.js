@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import cellClassNames from './cellClassNames';
 import CellModalWarning from './CellModalWarning';
 import serverUpdate from './serverUpdate';
-import setEndOfContentEditable from './tools/setEndOfContentEditable';
 import WhispererInput from './tools/WhispererInput';
 
 /* eslint-disable react/prop-types */
@@ -22,10 +21,12 @@ const MyReactCell = (props) => {
     primaryKey,
     removeRow,
     tableCellClass,
-    setPageData
+    setPageData,
   } = props;
 
   // TODO: Try to put this into useRef
+
+  const [inputEditValue, setInputEditValue] = useState('');
 
   const fnFilterEditedValue = (newValue, curCellValue, curRow) => {
     switch (Object.prototype.toString.call(colDefs[col].filterEditValue)) {
@@ -45,14 +46,14 @@ const MyReactCell = (props) => {
   };
 
   const updatePageDataWithRow = (newRow, y) => {
-    setPageData(prev => [...prev.slice(0, y), newRow, ...prev.slice(y + 1)]);
+    setPageData((prev) => [...prev.slice(0, y), newRow, ...prev.slice(y + 1)]);
   };
 
   const updatePageDataWithCell = (newCell, col, y) => {
-    setPageData(prev => [
+    setPageData((prev) => [
       ...prev.slice(0, y),
       { ...prev[y], [col]: newCell },
-      ...prev.slice(y + 1)
+      ...prev.slice(y + 1),
     ]);
   };
 
@@ -61,10 +62,10 @@ const MyReactCell = (props) => {
       case '[object Function]':
         return colDefs[col].filterEditChar(char, curCellValue, curRow);
       case '[object RegExp]':
-        return char.match(colDefs[col].filterEditChar);
+        return Boolean(char.match(colDefs[col].filterEditChar));
       case '[object Undefined]':
-        return char.match(
-          /[ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮa-zA-z0-9 .,-]/
+        return Boolean(
+          char.match(/[ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮa-zA-z0-9 .,-]/)
         );
       default:
         throw Error(
@@ -79,7 +80,6 @@ const MyReactCell = (props) => {
   const setWhisperActive = (st) => {
     whisperActive.current = st;
   };
-
 
   const [editModeStateActive, setEditModeStateActive] = useState(false);
   const [cellValueEdit, setCellValueEdit] = useState('');
@@ -114,23 +114,17 @@ const MyReactCell = (props) => {
     }
   };
 
-
-  useEffect(() => {
-    if (editModeStateActive) setEndOfContentEditable(divEditRef.current);
-  }, [editModeStateActive]);
-
+  // useEffect(() => {
+  //   if (editModeStateActive) setEndOfContentEditable(divEditRef.current);
+  // }, [editModeStateActive]);
 
   const acceptEditedValue = (editedValue) => {
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCEPT EDITED VALUE');
     setEditModeStateActive(false);
     const cellPrevValue = cellValue;
-    const operData = {};
-    const dataToSend = {};
-    dataToSend.operation = 'edit';
-    operData[primaryKey] = row[primaryKey]; // data for server must be in {line_id: 12932, some_col: 'new value'}
+    const operData = { operation: 'edit', newValue: {}, row };
     if (colDefs[col].onCl) {
-      dataToSend.operation = 'click';
-      operData[col] = cellValue;
+      operData.operation = 'click';
+      operData.newValue[col] = cellPrevValue;
     } else {
       const sanitizedInnerText = fnFilterEditedValue(
         editedValue,
@@ -140,17 +134,15 @@ const MyReactCell = (props) => {
       // if value was changed (curValue before edit is not same as sanitized text
       if (cellValue !== sanitizedInnerText) {
         updatePageDataWithCell(sanitizedInnerText, col, y);
-        operData[col] = sanitizedInnerText;
+        operData.newValue[col] = sanitizedInnerText;
       } else {
         setEditModeStateActive(false);
         cellRef.current.focus();
         return;
       }
     }
-    dataToSend.data = operData;
-    serverUpdate(dataToSend, colDefs, serverSideEdit)
+    serverUpdate(operData, colDefs, serverSideEdit)
       .then((updRow) => {
-        console.log('-.----------------------', updRow);
         updatePageDataWithRow(updRow, y);
         fnUpdateDataOnEditWithoutRender(updRow);
         setModalWarningActive(false);
@@ -163,13 +155,10 @@ const MyReactCell = (props) => {
         setModalWarningActive(true);
         setModalWarningText(JSON.stringify(err));
         cellRef.current.focus();
-        setEndOfContentEditable(cellRef.current);
       });
   };
 
-
   const onBlrCell = () => {
-    console.log('THIS IS ON BLURr CELL');
     if (modalWarningActive) {
       setModalWarningActive(false);
       setModalWarningText('');
@@ -181,7 +170,6 @@ const MyReactCell = (props) => {
   };
 
   const keyDn = (e) => {
-    console.log('THIS IS e.key', e.key, 'FILTER EDIT CHAR: ', fnFilterEditChar(e.key, cellValue, row))
     if (['Enter', 'Return'].includes(e.key) && !editModeStateActive) {
       e.preventDefault();
       // acceptEditedValue will recognize this row has onclick event and fires it
@@ -193,13 +181,19 @@ const MyReactCell = (props) => {
         if (editable(cellValue, row)) {
           e.preventDefault();
           setCellValueEdit(cellValue);
+          setInputEditValue(cellValue || '');
           setEditModeStateActive(true);
         }
         break;
-      case (e.key.match(/[\d\D]/)[0] === e.key.match(/[\d\D]/).input && fnFilterEditChar(e.key, cellValue, row)):
+      // DIRECT EDIT - WITHOUT F2
+      case e.key.match(/[\d\D]/)[0] === e.key.match(/[\d\D]/).input &&
+        fnFilterEditChar(e.key, cellValue, row):
+        console.log('DIRECT EDIT', e.key.match(/[\d\D]/));
+        console.log('DIRECT EDIT', e.key.match(/[\d\D]/)[0]);
         if (editable(cellValue, row)) {
           e.preventDefault();
           setCellValueEdit(e.key);
+          setInputEditValue(e.key);
           setEditModeStateActive(true);
         }
         break;
@@ -216,7 +210,17 @@ const MyReactCell = (props) => {
         setModalWarningActive(false);
         setModalWarningText('');
         break;
-      case ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', 'Tab'].includes(e.key): // arrow navigation
+      case [
+        'ArrowRight',
+        'ArrowLeft',
+        'ArrowUp',
+        'ArrowDown',
+        'PageUp',
+        'PageDown',
+        'Home',
+        'End',
+        'Tab',
+      ].includes(e.key): // arrow navigation
         e.preventDefault();
         fnNavigation(e.key); // navigation from reactGrid
         break;
@@ -228,12 +232,11 @@ const MyReactCell = (props) => {
   };
 
   const keyDnEdit = (e) => {
-    console.log(e.key);
     switch (true) {
       case ['Tab', 'Enter', 'Return'].includes(e.key): // ENTER + TAB - leave with save
         console.log('THIS IS ENTER');
         e.preventDefault();
-        acceptEditedValue(divEditRef.current.innerText);
+        acceptEditedValue(inputEditValue);
         break;
       case e.key === 'Escape': // ESC - leaving without update database
         e.preventDefault();
@@ -244,10 +247,17 @@ const MyReactCell = (props) => {
           cellRef.current.focus();
         }, 100);
         break;
-      case ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Backspace'].includes(e.key):
+      case [
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown',
+        'Delete',
+        'Backspace',
+      ].includes(e.key):
         console.log('SHOULD DO NOTHING');
         break;
-      case (!fnFilterEditChar(e.key, cellValue, row)):
+      case !fnFilterEditChar(e.key, cellValue, row):
         e.preventDefault();
         break;
       default:
@@ -260,13 +270,11 @@ const MyReactCell = (props) => {
     const cellPrevValue = cellValue;
     const operData = {};
     console.log('WD: ', wd);
-    operData.pdk = wd.pdk;
-    operData.name_pdk = wd.name;
-    operData.name_original = wd.name;
-    operData[primaryKey] = row[primaryKey]; // data for server must be in {line_id: 12932, some_col: 'new value'}
+    operData.row = row;
+    operData.operation = 'edit';
+    operData.newValue = { pdk: wd.pdk, name_pdk: wd.name };
     console.log('OPER DATA: ', operData);
-    const dataToSend = { operation: 'edit', data: operData };
-    serverUpdate(dataToSend, colDefs, serverSideEdit)
+    serverUpdate(operData, colDefs, serverSideEdit)
       .then((updRow) => {
         console.log('-.----------------------', updRow);
         updatePageDataWithRow(updRow, y);
@@ -283,7 +291,7 @@ const MyReactCell = (props) => {
       });
   };
 
-  const EditingDiv = () => (
+  const EditingDiv2 = () => (
     <div
       style={{ position: 'relative', outline: 'none' }}
       role="textbox"
@@ -302,33 +310,68 @@ const MyReactCell = (props) => {
     </div>
   );
 
-  const WhisperingEditingDiv = () => (
-    <WhispererInput
-      setWhisperActive={setWhisperActive}
-      keyTimeOut="1000"
-      setFinalData={setWhisperedData}
-      whisperApi={colDefs[col].whisperApi}
-      whisperTextKey="name"
-
-    >
-      <div
-        style={{ outline: 'none' }}
-        role="textbox"
-        tabIndex="0"
-        // onBlur={onBlr}
-        contentEditable
-        suppressContentEditableWarning
+  const InputEdit = () => {
+    useEffect(() => divEditRef.current.focus(), []);
+    return (
+      <input
+        type="text"
+        style={{
+          position: 'relative',
+          outline: 'none',
+          fontSize: '1em',
+          paddingLeft: 0,
+          border: 0,
+          width: '100%',
+          background: 'rgba(0,0,0,0)',
+        }}
         ref={divEditRef}
+        value={inputEditValue}
         onKeyDown={keyDnEdit}
         onBlur={() => {
-          console.log('WHISPERING EDITING DIV BLURED');
-          setTimeout(() => acceptEditedValue(divEditRef.current.innerText), 1000);
+          console.log('EDITING DIV BLURED', inputEditValue);
+          acceptEditedValue(inputEditValue);
+        }}
+        onChange={(e) => setInputEditValue(e.target.value)}
+      />
+    );
+  };
+
+  const WhisperingEditingDiv = ({ cellVal }) => {
+    const [whisValue, setWhisValue] = useState(inputEditValue || '');
+    useEffect(() => {
+      divEditRef.current.focus();
+    }, []);
+    return (
+      <WhispererInput
+        setWhisperActive={setWhisperActive}
+        keyTimeOut="1000"
+        setFinalData={setWhisperedData}
+        whisperApi={colDefs[col].whisperApi}
+        divStyle={{
+          position: 'relative',
+          outline: 'none',
+          fontSize: '1em',
+          paddingLeft: 0,
+          border: 0,
+          width: '100%',
+          background: 'rgba(0,0,0,0)',
         }}
       >
-        {cellValueEdit}
-      </div>
-    </WhispererInput>
-  );
+        <input
+          type="text"
+          // onBlur={onBlr}
+          ref={divEditRef}
+          onKeyDown={keyDnEdit}
+          value={whisValue}
+          onChange={(e) => setWhisValue(e.target.value)}
+          onBlur={() => {
+            console.log('WHISPERING EDITING DIV BLURED', whisValue);
+            setTimeout(() => acceptEditedValue(whisValue), 1000);
+          }}
+        />
+      </WhispererInput>
+    );
+  };
 
   const titleRender = (v, r) => {
     switch (Object.prototype.toString.call(colDefs[col].title)) {
@@ -346,14 +389,17 @@ const MyReactCell = (props) => {
     }
   };
 
-
   return (
     <td
       className={[
         cellClassNames(colDefs[col].fnCellClass, cellValue, row),
-        tableCellClass
+        tableCellClass,
       ].join(' ')}
-      style={colDefs[col].width ? { width: `${colDefs[col].width}` } : {}}
+      style={{
+        width: colDefs[col].width,
+        maxWidth: colDefs[col].maxWidth || colDefs[col].width,
+        minWidth: colDefs[col].minWidth || colDefs[col].width,
+      }}
       role="gridcell"
       key={`${String(y)}-${String(x)}`}
       ref={cellRef}
@@ -370,8 +416,10 @@ const MyReactCell = (props) => {
       title={titleRender(cellValue, row)}
     >
       {!editModeStateActive && cellRenderer(cellValue, row)}
-      {(editModeStateActive && colDefs[col].whisper) && <WhisperingEditingDiv />}
-      {(editModeStateActive && !colDefs[col].whisper) && <EditingDiv />}
+      {editModeStateActive && colDefs[col].whisper && (
+        <WhisperingEditingDiv cellVal={cellValue} />
+      )}
+      {editModeStateActive && !colDefs[col].whisper && <InputEdit />}
       {modalWarningActive && (
         <CellModalWarning cellRef={cellRef} show x={x} y={y}>
           <div title={modalWarningText}>{modalWarningText.slice(0, 25)}</div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import MyReactCell from './MyReactCell';
 import propsAreEqual from './propsAreEqual';
 
@@ -18,7 +18,7 @@ const MyReactRow = (props) => {
     primaryKey,
     removeRow,
     tableCellClass,
-    setPageData
+    setPageData,
   } = props;
 
   // --------------------------------------------------------------------------
@@ -41,13 +41,9 @@ const MyReactRow = (props) => {
   };
 
   return (
-    <tr
-      className={rowClassNames(row)}
-      key={y}
-      tabIndex={0}
-    >
+    <tr className={rowClassNames(row)} key={y} tabIndex={0}>
       {Object.keys(colDefs)
-        .filter(cD => !colDefs[cD].hidden && colDefs[cD].tableHead)
+        .filter((cD) => !colDefs[cD].hidden && colDefs[cD].tableHead)
         .map((col, x) => (
           <MyReactCell
             role="gridcell"
@@ -76,9 +72,4 @@ const MyReactRow = (props) => {
   );
 };
 
-export default React.memo(MyReactRow, (prev, act) => {
-  if (propsAreEqual(prev.row, act.row) && propsAreEqual(prev.colDefs, act.colDefs)) {
-    return true;
-  }
-  return propsAreEqual(prev, act);
-});
+export default React.memo(MyReactRow);

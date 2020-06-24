@@ -1,9 +1,7 @@
 import ReactDOM from 'react-dom';
 import React, { useEffect } from 'react';
 
-const CellModalWarning = ({
-  show, children, cellRef, x, y
-}) => {
+const CellModalWarning = ({ show, children, cellRef, x, y }) => {
   let modLeft = 0;
   let modTop = 0;
 
@@ -18,16 +16,21 @@ const CellModalWarning = ({
   if (!cellRef.current) return null;
   modLeft = cellRef.current.getBoundingClientRect().left + 10;
   modTop = cellRef.current.getBoundingClientRect().top + 25;
-  modLeft = (modLeft + 160 > window.innerWidth) ? modLeft = window.innerWidth - 160 : modLeft;
-  modTop = (modTop + 40 > window.innerHeight) ? modTop = window.innerHeight - 40 : modTop;
-
+  modLeft =
+    modLeft + 160 > window.innerWidth
+      ? (modLeft = window.innerWidth - 160)
+      : modLeft;
+  modTop =
+    modTop + 40 > window.innerHeight
+      ? (modTop = window.innerHeight - 40)
+      : modTop;
 
   const modalStyle = {
     display: 'grid',
     alignItems: 'center',
     justifyContent: 'center',
     top: modTop,
-    left: modLeft
+    left: modLeft,
   };
   const modalDiv = (
     <div
@@ -43,8 +46,8 @@ const CellModalWarning = ({
   modEl.id = 'cellModalEl';
   document.body.appendChild(modEl);
   return (
-    show
-    && ReactDOM.createPortal(modalDiv, document.getElementById('cellModalEl'))
+    show &&
+    ReactDOM.createPortal(modalDiv, document.getElementById('cellModalEl'))
   );
 };
 

@@ -5,12 +5,11 @@
     --mygreybackground: #e9ecef
 }
 
-.main-table-container {
+.defaultGridactContainer {
     display: inline-grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 40px 1fr;
-    /*margin-left: 5px;*/
-    /*margin-right: 5px*/
+    grid-template-rows: 40px minmax(0, min-content);
+    grid-template-columns: minmax(0, min-content);
+    justify-content: center;
 }
 
 .table-control {
@@ -64,7 +63,6 @@
 }
 
 
-
 div.react-grid-HeaderCell {
     padding: 2px 0px 0px 0px;
     text-align: center;
@@ -91,44 +89,8 @@ button.zero {
     border: 0;
 }
 
-@keyframes cellFocus {
-    0% {
-        background-color: dodgerblue;
-    }
-    50% {
-        background-color: lime;
-    }
-    100% {
-        background-color: var(--crxgreen);
-    }
-}
-
-td:focus {
-    background-color: var(--crxgreen) !important;
-    animation-name: cellFocus;
-    animation-duration: 300ms;
-    outline: none
-}
-
-@keyframes rowgeneration {
-    0% {
-        background-color: white;
-    }
-    50% {
-        background-color: lightskyblue;
-    }
-    100% {
-        background-color: white;
-    }
-}
-
-tr.flash {
-    background-color: white;
-    animation-name: rowgeneration;
-    animation-duration: 250ms;
-}
-
-button.add {
+button.addBtn {
+    margin-left: 5px;
     height: 35px;
     border: 0 solid rgba(0, 0, 0, 0);
     background: limegreen;
@@ -161,7 +123,9 @@ button.add.right:focus, button.add.left:focus {
 }
 
 
-button.remove {
+button.removeBtn {
+    margin-left: 5px;
+    margin-right: 5px;
     outline: none;
     height: 35px;
     border: none;
@@ -263,36 +227,54 @@ button.remove {
 }
 
 .iconic {
-  width: 24px;
-  height: 24px;
+    width: 24px;
+    height: 24px;
 }
+
 .iconic:hover {
-  fill: red;
+    fill: red;
 }
 
 @media screen and (max-width: 800px) {
     .main-table-container {
-    grid-template-rows: 120px 1fr;
+        grid-template-rows: 120px 1fr;
 
-}
+    }
 
     .table-control {
+        display: grid;
+        grid-auto-flow: row;
+        grid-template-columns: 1fr;
+        justify-content: center;
+    }
+
+    .display-inline {
+    width: 100%;
     display: grid;
-    grid-template-rows: 40px 40px 40px;
-    grid-template-columns: 1fr
+    grid-auto-flow: column;
+    align-items: center;
+        justify-content: center;
+        margin-bottom: 3px;
 }
 
+    .defaultGridactContainer {
+        margin-top: 0;
+        display: inline-grid;
+        grid-template-rows: minmax(0, min-content) minmax(0, min-content);
+        grid-template-columns: minmax(0, min-content);
+        justify-content: center;
+    }
 
-.search-control {
-    justify-content: center;
-}
+    .search-control {
+        justify-content: center;
+    }
 
-.add-remove-control {
-    justify-content: center;
-}
+    .add-remove-control {
+        justify-content: center;
+    }
 
-.paging-control {
-    justify-content: center;
-}
+    .paging-control {
+        justify-content: center;
+    }
 }
 
