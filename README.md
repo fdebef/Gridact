@@ -22,13 +22,12 @@ Gridact is React component for displaying large datasets in table supporting
     - custom allowed values and characters
     - error messages
 
-##**[Live demo](https://codesandbox.io/s/gridact-dlzz6) on CodeSandBox**
+##**[Live demo](https://codesandbox.io/s/gridact-89khh) on CodeSandBox**
 
 
 ##Changelog 2.5.0
 - new format of data from edit, simplier `{newValue, column, row}` From Row you can find whatever identification you need.
-##TODO: describe in manual!!!!!!!!!!!!!!!!!!!!!!!!!!
-Remove primary_key - you do not need this anymore
+Remove primary_key property of GridAct - you do not need this anymore
 
 ##Changelog 2.1.0
 - _editable_ option in column definitions can now be function (e.g. you want to edit only if some condition is met)
