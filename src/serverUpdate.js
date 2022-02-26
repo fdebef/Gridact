@@ -1,5 +1,8 @@
 const serverUpdate = (dataToSend, colDefs, serverSideEdit) =>
   new Promise((resolve, reject) => {
+    try {
+      delete dataToSend.row.gridactPrimaryKey;
+    } catch (e) {}
     serverSideEdit(dataToSend)
       .then((rs) => {
         // successfull return

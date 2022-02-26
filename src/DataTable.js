@@ -1,89 +1,17 @@
-import React from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
+import GridContext from './GridContext/GridContext';
 import MyReactRow from './MyReactRow';
 import TableHead from './TableHead';
 
 /* eslint-disable react/prop-types */
 
-const DataTable = (props) => {
-  const {
-    pageData,
-    colDefs,
-    tableClasses,
-    sortTable,
-    sortState,
-    fnGetActiveCell,
-    fnSetActiveCell,
-    fnUpdateDataOnEditWithoutRender,
-    fnRowClass,
-    serverSideEdit,
-    primaryKey,
-    fnUpdateRefStore,
-    fnGetRefStore,
-    removeRow,
-    wrapperDivClass,
-    onEnterMoveDown,
-    tableCellClass,
-    setPageData,
-  } = props;
+const DataTable = () => {
+  const LocalContext = useContext(GridContext);
 
   // --------------------------------------------------------------------------
   // activeCell is further used for navigation
   // fnSetActiveCell is further postponed to row and cell
   // so the cell itself can setup activeCell - e.g. onClick={cell.focus()}
-
-  // --------------------------------------------------------------------------
-  // number of cols and rows for navigation (not to go outside table
-  let colRowsCount;
-  if (pageData.length) {
-    colRowsCount = [
-      Object.keys(colDefs).filter((k) => !k.hidden).length,
-      pageData.length,
-    ];
-  }
-
-  // --------------------------------------------------------------------------
-  // fnNavigation calculates new coordinates
-  // and sets focus to calculated cell - based on ref in store
-  const fnNavigation = (keyCode) => {
-    let [calcX, calcY] = fnGetActiveCell();
-    const [xCount, yCount] = colRowsCount; // number of columns and rows
-    if (keyCode === 'move_next') {
-      onEnterMoveDown ? (keyCode = 'ArrowDown') : (keyCode = 'ArrowRight');
-    }
-    switch (keyCode) {
-      case 'ArrowUp': // up
-        calcY = calcY - 1 > 0 ? calcY - 1 : 0;
-        break;
-      case 'ArrowDown': // down
-        calcY = calcY + 1 < yCount - 1 ? calcY + 1 : yCount - 1;
-        break;
-      case 'ArrowLeft': // left
-        calcX = calcX - 1 > 0 ? calcX - 1 : 0;
-        break;
-      case 'ArrowRight': // right
-        calcX = calcX + 1 < xCount - 1 ? calcX + 1 : xCount - 1;
-        break;
-      case 'Tab': // right (TAB)
-        calcX = calcX + 1 < xCount - 1 ? calcX + 1 : xCount - 1;
-        break;
-      case 'PageUp': // pgUp
-        calcY = 0;
-        break;
-      case 'PageDown': // pgDn
-        calcY = yCount - 1;
-        break;
-      case 'Home': // Home
-        calcX = 0;
-        break;
-      case 'End': // End
-        calcX = xCount - 1;
-        break;
-      default:
-        break;
-    }
-    fnSetActiveCell([calcX, calcY]);
-    fnGetRefStore()[`${String(calcX)}-${String(calcY)}`].current.focus();
-  };
 
   const wrpClass = (wrpProp) => {
     switch (Object.prototype.toString.call(wrpProp)) {
@@ -111,46 +39,18 @@ const DataTable = (props) => {
     }
   };
 
-  const widthStyle = (width) => {
-    if (width) {
-      return { width };
-    }
-  };
-
-  if (pageData.length) {
+  if (LocalContext.pageData.length) {
     return (
-      <div className={wrpClass(wrapperDivClass)} style={{}}>
+      <div className={wrpClass(LocalContext.wrapperDivClass)} style={{}}>
         <table
           role="grid"
-          className={tblClass(tableClasses)}
-          style={{ cursor: 'default' }}
+          className={tblClass(LocalContext.tableClasses)}
+          style={{ cursor: 'default', caretColor: 'transparent' }}
         >
-          <TableHead
-            colDefs={colDefs}
-            widthStyle={widthStyle}
-            sortTable={sortTable}
-            sortState={sortState}
-          />
+          <TableHead />
           <tbody>
-            {pageData.map((row, y) => (
-              <MyReactRow
-                key={y}
-                row={row}
-                y={y}
-                fnUpdateRefStore={fnUpdateRefStore}
-                fnSetActiveCell={fnSetActiveCell}
-                colDefs={colDefs}
-                fnNavigation={fnNavigation}
-                setPageData={setPageData}
-                fnRowClass={fnRowClass}
-                serverSideEdit={serverSideEdit}
-                primaryKey={primaryKey}
-                removeRow={removeRow}
-                tableCellClass={tableCellClass}
-                fnUpdateDataOnEditWithoutRender={
-                  fnUpdateDataOnEditWithoutRender
-                }
-              />
+            {LocalContext.pageData.map((row, y) => (
+              <MyReactRow key={row.gridactPrimaryKey} y={y} row={row} />
             ))}
           </tbody>
         </table>
@@ -158,7 +58,7 @@ const DataTable = (props) => {
     );
   }
   return (
-    <div className={wrpClass(wrapperDivClass)} style={{}}>
+    <div className={wrpClass(LocalContext.wrapperDivClass)} style={{}}>
       <div
         className="display-inline align-center"
         style={{ marginTop: '20px' }}

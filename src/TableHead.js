@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import SortArrows from './SortArrows';
 import fnColDefs from './fnColDefs';
+import GridContext from './GridContext/GridContext';
 
-const TableHead = (props) => {
-  const { colDefs, widthStyle, sortTable, sortState } = props;
+const TableHead = () => {
+
+  const LocalContext = useContext(GridContext);
+
+  const { colDefs } = LocalContext;
 
   return (
     <thead>
@@ -16,9 +20,9 @@ const TableHead = (props) => {
               key={col}
               title={colDefs[col].tableHeadTitle}
               role="gridcell"
-              style={{ ...widthStyle(colDefs[col].width), cursor: 'pointer' }}
+              style={{ width: colDefs[col].width, cursor: 'pointer' }}
               onClick={() => {
-                sortTable(col);
+                LocalContext.fnSortTable(col);
               }}
             >
               {colDefs[col].sortable && (
@@ -30,7 +34,7 @@ const TableHead = (props) => {
                     <SortArrows
                       colDefs={colDefs}
                       col={col}
-                      sortState={sortState}
+                      sortState={LocalContext.sortState}
                     />
                   </span>
                 </span>

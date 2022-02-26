@@ -1,51 +1,80 @@
 import React, { useRef, useState, useEffect } from 'react';
 import WhispererTable from './WhispererTable';
 import './whisperStyle.css';
-
-const KEY_UP = 38;
-const KEY_DOWN = 40;
-const KEY_LEFT = 37;
-const KEY_RIGHT = 39;
-const KEY_RETURN = 13;
-const KEY_ENTER = 14;
-const KEY_ESCAPE = 27;
-const KEY_TAB = 9;
+import SmallModal from './SmallModal';
 
 const FUNCTION_KEYS = [
-  KEY_UP,
-  KEY_DOWN,
-  KEY_LEFT,
-  KEY_RIGHT,
-  KEY_RETURN,
-  KEY_ENTER,
-  KEY_ESCAPE,
-  KEY_TAB,
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'Return',
+  'Enter',
+  'Escape',
+  'Tab',
+  'PageUp',
+  'PageDown',
 ];
 
-const WhispererInput = ({
+// WhispererInput takes child (usually input) and wraps it
+// with whispering functionality.
+// WhisperApi takes object with sstring key and awaits
+// returning from server an object with data key
+// that includes Array of Objects, that are displayed
+// in whisper table.
+
+const WhispererInput = function ({
   children,
   keyTimeOut,
   setFinalData,
   whisperApi,
+  additionalWhisperData,
+  onOpen,
+  onClose,
   divStyle,
-}) => {
+  parentRef,
+}) {
   const [whisperData, setWhisperData] = useState([]);
   const selectedData = useRef({});
   const [activeRow, setActiveRow] = useState(null);
+  const [noDataWarning, setNoDataWarning] = useState(false);
+  const timeout = useRef();
+
+  const getBoundingBox = (ref) => {
+    if (ref.current) {
+      return {
+        x: ref.current.getBoundingClientRect().left,
+        y: ref.current.getBoundingClientRect().top,
+        h: ref.current.getBoundingClientRect().height,
+      };
+    }
+  };
 
   const getWhisperData = async () => {
     if (children.ref.current) {
-      if (children.ref.current.value.length > 3) {
+      if (children.ref.current.value.length > 2) {
         try {
-          const wDataFromUser = await whisperApi({
+          let wDataFromUser = await whisperApi({
             sstring: children.ref.current.value.replace(
               String.fromCharCode(160),
               ' '
             ),
+            additionalWhisperData,
           });
           setActiveRow(null);
-          setWhisperData(JSON.parse(wDataFromUser).data);
+          if (
+            Object.prototype.toString.call(wDataFromUser) !== '[object Object]'
+          ) {
+            wDataFromUser = JSON.parse(wDataFromUser);
+          }
+          if (wDataFromUser.data.length === 0) {
+            setNoDataWarning(true);
+          } else {
+            setNoDataWarning(false);
+          }
+          setWhisperData(wDataFromUser.data);
         } catch (er) {
+          console.log('THIS IS CHILDREN: ', children);
           console.log('ERROR GETTING WHISPER DATA: ', er);
         }
       } else {
@@ -53,8 +82,6 @@ const WhispererInput = ({
       }
     }
   };
-
-  let timeout;
 
   const handleInput = (e, origElemHandle) => {
     if (
@@ -65,52 +92,68 @@ const WhispererInput = ({
       e.key === 'End' ||
       e.key === 'Shift'
     ) {
-      console.log('DOING NOTHING: ');
       return;
     }
     // whisper table visible, no data selected
     if (whisperData.length && activeRow === null) {
-      switch (e.keyCode) {
-        case KEY_TAB:
+      switch (e.key) {
+        case 'Tab':
           e.preventDefault();
           setActiveRow(0);
           break;
-        case KEY_DOWN:
+        case 'ArrowDown':
           setActiveRow(0);
           break;
-        case KEY_RETURN:
+        case 'Enter':
           e.preventDefault();
           setWhisperData([]);
           break;
-        case KEY_ESCAPE:
-          console.log('EXCAPE PRASSED');
+        case 'Escape':
           e.preventDefault();
           setActiveRow(null);
           setWhisperData([]);
+          break;
+        case 'PageDown':
+          e.preventDefault();
+          break;
+        case 'PageUp':
+          e.preventDefault();
           break;
         default:
           break;
       }
       // whisper table visible, some row selected
     } else if (whisperData.length && activeRow !== null) {
-      switch (e.keyCode) {
-        case KEY_DOWN:
+      switch (e.key) {
+        case 'ArrowDown':
           e.preventDefault();
           setActiveRow((p) => {
-            if (p >= whisperData.length - 1) return p;
+            if (p + 1 > whisperData.length - 1) return p;
             return p + 1;
           });
           break;
-        case KEY_UP:
+        case 'ArrowUp':
           e.preventDefault();
           setActiveRow((p) => {
-            if (p <= 0) {
-              return null;
-            }
+            if (p - 1 < 0) return null;
             return p - 1;
           });
           break;
-        case KEY_RETURN:
+        case 'PageDown':
+          e.preventDefault();
+          setActiveRow((p) => {
+            if (p + 3 > whisperData.length - 1) return whisperData.length - 1;
+            return p + 3;
+          });
+          break;
+        case 'PageUp':
+          e.preventDefault();
+          setActiveRow((p) => {
+            if (p - 3 < 0) return null;
+            return p - 3;
+          });
+          break;
+        case 'Enter':
           e.preventDefault();
           selectedData.current = whisperData[activeRow];
           // hide whisper table
@@ -118,11 +161,14 @@ const WhispererInput = ({
           setActiveRow(null);
           setFinalData(selectedData.current);
           break;
-        case KEY_ESCAPE:
+        case 'Esc':
           setActiveRow(null);
           e.preventDefault();
           setWhisperData([]);
           // children.ref.current.focus();
+          break;
+        case 'Tab':
+          e.preventDefault();
           break;
         default:
           break;
@@ -131,7 +177,7 @@ const WhispererInput = ({
       !whisperData.length &&
       Object.keys(selectedData.current).length
     ) {
-      if (e.keyCode === KEY_RETURN) {
+      if (e.key === 'Enter') {
         e.preventDefault();
         const sd = selectedData.current;
         setFinalData(sd);
@@ -147,17 +193,17 @@ const WhispererInput = ({
     ) {
       origElemHandle(e);
     }
-    if (!FUNCTION_KEYS.includes(e.keyCode)) {
-      console.log();
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
+    if (!FUNCTION_KEYS.includes(e.key)) {
+      if (timeout.current) {
+        clearTimeout(timeout.current);
+        timeout.current = null;
       }
-      timeout = setTimeout(getWhisperData, keyTimeOut);
+      timeout.current = setTimeout(getWhisperData, keyTimeOut);
     }
   };
 
-  console.log('THIS IS CHILDREN PRPS: ', children.props);
+  // Whispering child clones the child element and adds functionality
+  // for handling input to this input.
 
   const whisperingChild = React.cloneElement(children, {
     ...children.props,
@@ -165,21 +211,43 @@ const WhispererInput = ({
       // add special action to onKeyDown with handleInput fn
       handleInput(e, children.props.onKeyDown);
     },
-    style: { ...divStyle, fontStyle: 'italic' },
+    style: { ...children.props.style, fontStyle: 'italic' },
   });
 
   return (
-    <div style={{ width: '100%', display: 'grid' }}>
+    <div
+      id="whispererInput"
+      style={{ width: '100%', display: 'grid', ...divStyle }}
+    >
       {whisperingChild}
-      {Boolean(whisperData.length) && (
+      {whisperData.length > 0 && (
         <WhispererTable
-          whisperData={whisperData.slice(0, 100)}
+          whisperData={whisperData}
           setWhisperData={setWhisperData}
           inputRef={children.ref}
           activeRow={activeRow}
           setActiveRow={setActiveRow}
           setFinalData={setFinalData}
+          selectedData={selectedData}
+          onOpen={onOpen}
+          onClose={onClose}
+          tableLeft={getBoundingBox(children.ref).x}
+          tableTop={
+            getBoundingBox(children.ref).y + getBoundingBox(children.ref).h
+          }
         />
+      )}
+      {noDataWarning && (
+        <SmallModal
+          setShowSelf={setNoDataWarning}
+          mHeight={30}
+          mWidth={150}
+          timeout={1000}
+          mLeft={getBoundingBox(children.ref).x}
+          mTop={getBoundingBox(children.ref).y + getBoundingBox(children.ref).h}
+        >
+          Žádná data
+        </SmallModal>
       )}
     </div>
   );

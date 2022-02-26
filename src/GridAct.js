@@ -1,166 +1,47 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ReactComponent as AddRow } from '../static/images/icons/addRow.svg';
-import { ReactComponent as DeleteRow } from '../static/images/icons/deleteRow.svg';
-import { ReactComponent as MultiPages } from '../static/images/icons/paging.svg';
-import { ReactComponent as PlayLeft } from '../static/images/icons/playLeft.svg';
-import { ReactComponent as PlayRight } from '../static/images/icons/playRight.svg';
-import { ReactComponent as PlayEndLeft } from '../static/images/icons/playEndLeft.svg';
-import { ReactComponent as PlayEndRight } from '../static/images/icons/playEndRight.svg';
-import { ReactComponent as SearchIcon } from '../static/images/icons/searchIcon.svg';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import SearchIcon from '../../static/images/icons/searchIcon.svg';
 import './styling.css';
 import './tableStyling.css';
 import DataTable from './DataTable';
-
-//-----------------------------------------------------
-// Subcomponents for main component
-
-const PagingSelector = (props) => {
-  const { pageLength, changePageLength, pagingOptions } = props;
-  return (
-    <>
-      <span key="17" className="FFInputDesc">
-        <MultiPages
-          style={{
-            fill: 'var(--crxblue)',
-            height: '25px',
-            width: '25px',
-            marginTop: '2px',
-          }}
-        />
-      </span>
-
-      <select
-        className="FFInputField paging-font"
-        style={{ width: 'auto' }}
-        value={pageLength}
-        onChange={changePageLength}
-      >
-        {pagingOptions
-          .sort((a, b) => a - b)
-          .map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-      </select>
-    </>
-  );
-};
-
-const PageSelector = (props) => {
-  const { changePage, tableDataLength, pageLength, pageActual } = props;
-  return (
-    <div key="18" className="display-inline align-right">
-      <button
-        key="1"
-        type="button"
-        className="forward paging-font"
-        onClick={() => changePage('first')}
-      >
-        <span style={{ marginRight: '5px' }}>{1}</span>
-        <PlayEndLeft
-          className="hand"
-          style={{ fill: 'dodgerblue', height: '20px', width: '20px' }}
-        />
-      </button>
-      <button
-        key="3"
-        type="button"
-        className="forward paging-font"
-        onClick={() => changePage('-1')}
-      >
-        <PlayLeft
-          className="hand"
-          style={{ fill: 'dodgerblue', height: '20px', width: '20px' }}
-        />
-      </button>
-      <span key="5" className="paging-font">
-        {pageActual}
-      </span>
-      <button
-        key="6"
-        type="button"
-        className="forward paging-font"
-        onClick={() => changePage('+1')}
-      >
-        <PlayRight
-          className="hand"
-          style={{ fill: 'dodgerblue', height: '20px', width: '20px' }}
-        />
-      </button>
-      <button
-        key="8"
-        type="button"
-        className="forward paging-font"
-        onClick={() => changePage('last')}
-      >
-        <PlayEndRight
-          className="hand"
-          style={{ fill: 'dodgerblue', height: '20px', width: '20px' }}
-        />
-        <span style={{ marginLeft: '5px' }}>
-          {Math.ceil(tableDataLength / pageLength)}
-        </span>
-      </button>
-      <span className="paging-font">{` (${tableDataLength})`}</span>
-    </div>
-  );
-};
-
-const AddRemoveButtons = (props) => {
-  const { addRow, removeRow } = props;
-  return (
-    <div key="19" className="display-inline align-center">
-      <button
-        key="20"
-        type="button"
-        title="Přidat nový řádek..."
-        onClick={addRow}
-        className="addBtn"
-      >
-        <AddRow
-          className="hand"
-          style={{
-            fill: 'white',
-            height: '22px',
-            width: '22px',
-            marginTop: '6px',
-          }}
-        />
-      </button>
-      <button
-        key="21"
-        type="button"
-        title="Vymazat řádek, na kterém stojí kurzor"
-        onClick={removeRow}
-        className="removeBtn"
-      >
-        <DeleteRow
-          className="hand"
-          style={{
-            fill: 'white',
-            height: '22px',
-            width: '22px',
-            marginTop: '6px',
-          }}
-        />
-      </button>
-    </div>
-  );
-};
+import CellModalWarning from './CellModalWarning';
+import checkPageLength from './checkPageLength';
+import changePage from './changePage';
+import PageSelector from './pageSelector';
+import fnChangeTableFilter from './fnChangeTableFilter';
+import removeRow from './removeRow';
+import PagingSelector from './PagingSelector';
+import addRow from './addRow';
+import AddRemoveButtons from './AddRemoveButtons';
+import GridContext from './GridContext/GridContext';
+import navigation from './fnNavigation';
+import fnSortTable from './fnSortTable';
+import sortData from './sortData';
 
 // --------------------------------------------------------------------------
 // Main GridAct component
 
+const primaryKey = 'gridactPrimaryKey';
+
+const useFilter = (filter = '', updateFn) => {
+  const [state, setState] = useState(filter);
+
+  const changeFilter = useCallback((newValue) => {
+    setState(newValue);
+    updateFn(newValue);
+  }, []);
+
+  return [state, changeFilter];
+};
+
 const GridAct = (props) => {
   const {
     data,
+    setData,
     colDefs,
     tableClasses,
     pagingOptions,
     fnRowClass,
     serverSideEdit,
-    primaryKey,
     wrapperDivClass,
     showFilter,
     addRemove,
@@ -172,12 +53,20 @@ const GridAct = (props) => {
     setFilteredData,
     initSort,
     mainTableContainerClass,
+    filterValue,
   } = props;
+  // hook 1
   const [pageData, setPageData] = useState([]);
+  // hook 2
   const pageActual = useRef(1);
+  // hook 3
   const pageLength = useRef(pagingOptions[0] || 10);
-  const tableFilterValue = useRef('');
+  // hook 4
   const sortState = useRef(initSort || { col: undefined, dir: undefined });
+  // hook 5
+  const [modalWarning, setModalWarning] = useState('');
+  // hook 6
+  const buttonsRef = useRef();
 
   // --------------------------------------------------------------------------
   // On first data load we create:
@@ -186,13 +75,30 @@ const GridAct = (props) => {
   // pageData: data of actual page, set to first page on row data load
   // set actualPage to first (1)
   // ref to search field
+  // hook 7
   const inputFieldRef = useRef(null);
-  const data2 = useRef(data.slice()); // copy of props, that can be manipulated.
-  const tableData = useRef([]); // actual table data - filtered, sorted,...
+  // hook 8
+  const data2 = useRef(
+    data.map((r, idx) => ({ ...r, gridactPrimaryKey: idx }))
+  ); // copy of props, that can be manipulated.
+  const setData2 = (newRef) => {
+    if (Object.prototype.toString.call(newRef) === '[object Function]') {
+      data2.current = newRef(data2.current.slice());
+    } else data2.current = newRef.slice();
+  };
+  // hook 9
+  const [tableData, setTableData] = useState([]); // actual table data - filtered, sorted,...
+  const setTableDataAdv = (newData) => {
+    checkPageLength(pageActual, newData, pageLength);
+    const sortedNewData = sortData(newData, sortState);
+    // const unRefData = [...sortedNewData]; (originally .map pattern)
+    // for new sorted data instance
+    setTableData([...sortedNewData]);
+  };
+  // hook 10
   const activeCell = useRef([undefined, undefined]);
   // We could handle fnGetActiveCell() variable in Row separately,
   // but through this function we can have only one central
-
   const fnGetActiveCell = () => activeCell.current;
   const fnSetActiveCell = (newActiveCell) => {
     activeCell.current = newActiveCell;
@@ -202,6 +108,7 @@ const GridAct = (props) => {
   // refStore stores all refs to currently displayed cells.
   // It is promised-based, as when rendering individual cells, we do not need
   // to wait for this operation - rendering is cca 30% swifter.
+  // hook 11
   const refStore = useRef({});
   const fnUpdateRefStore = (x, y, cellRef) =>
     new Promise((resolve) => {
@@ -212,55 +119,42 @@ const GridAct = (props) => {
   const fnGetRef = (x, y) =>
     refStore.current[`${String(x)}-${String(y)}`].current;
 
-  useEffect(() => {
-    if (data) {
-      if (data.length) {
-        data2.current = data.slice();
-        if (sortState.current.dir === 'desc') {
-          tableData.current = data.slice().sort((a, b) => {
-            if (
-              (a[sortState.current.col] || 0) < (b[sortState.current.col] || 0)
-            )
-              return 1;
-            if (
-              (a[sortState.current.col] || 0) > (b[sortState.current.col] || 0)
-            )
-              return -1;
-            return 0;
-          });
-        } else if (sortState.current.dir === 'asc') {
-          tableData.current = data.slice().sort((a, b) => {
-            if (
-              (a[sortState.current.col] || 0) < (b[sortState.current.col] || 0)
-            )
-              return -1;
-            if (
-              (a[sortState.current.col] || 0) > (b[sortState.current.col] || 0)
-            )
-              return 1;
-            return 0;
-          });
-        } else {
-          tableData.current = data.slice();
-        }
-      } else {
-        tableData.current = data.slice();
-        activeCell.current = [undefined, undefined];
-      }
-    }
-    tableFilterValue.current = '';
-    // sortState.current = { col: undefined, dir: undefined };
-    pageActual.current = 1;
-    // setPageLength not necessary, only to keep exhaustive-deps lint rule
-    setPageData(tableData.current.slice(0, pageLength.current));
-    if (
-      Object.prototype.toString.call(setFilteredData) === '[object Function]' &&
-      tableData.current.length
-    ) {
-      setFilteredData(tableData.current);
-    }
-  }, [data, setFilteredData]);
+  // hook 12
+  const [filter, setFilter] = useFilter('', (f) => {
+    fnChangeTableFilter(f, data2, tableData, setFilteredData, setTableData);
+  });
 
+  // hook 13
+  useEffect(() => {
+    setFilter('');
+    setData2(data.map((r, idx) => ({ ...r, gridactPrimaryKey: idx })));
+    setTableDataAdv(data2.current);
+  }, [data, setFilter]);
+
+  // hook 14
+  useEffect(() => {
+    if (tableData.length) {
+      checkPageLength(pageActual, tableData, pageLength);
+      setPageData(
+        tableData.slice(
+          (pageActual.current - 1) * pageLength.current,
+          pageActual.current * pageLength.current
+        )
+      );
+      if (
+        Object.prototype.toString.call(setFilteredData) ===
+          '[object Function]' &&
+        tableData.length
+      ) {
+        setFilteredData(tableData);
+      }
+    } else {
+      setPageData([]);
+      activeCell.current = [undefined, undefined];
+    }
+  }, [setFilteredData, tableData]);
+
+  // hook 15
   useEffect(() => {
     if (
       activeCell.current[0] >= 0 &&
@@ -274,317 +168,29 @@ const GridAct = (props) => {
     }
   }, [pageData]);
 
-  // --------------------------------------------------------------------------
-  // On pageChange we first calculate new page (check if less then 1st and
-  // more then all pages. Then calculate actual PageData
-  const changePage = (dir) => {
-    let newPage = 0; // for calculating new page
-    switch (dir) {
-      case '-1':
-        newPage = pageActual.current - 1 < 1 ? 1 : pageActual.current - 1;
-        break;
-      case '+1':
-        newPage =
-          pageActual.current + 1 >
-          Math.ceil(tableData.current.length / pageLength.current)
-            ? Math.ceil(tableData.current.length / pageLength.current)
-            : pageActual.current + 1;
-        break;
-      case 'first':
-        newPage = 1;
-        break;
-      case 'last':
-        newPage = Math.ceil(tableData.current.length / pageLength.current);
-        break;
-      default:
-        newPage = 1;
-    }
-    // const startIndex = (newPage - 1) * pageLength;
-    // const endIndex = newPage * pageLength;
-    // pageData = tableData.current.slice(startIndex, endIndex); // calculate pageData
-    pageActual.current = newPage;
-    setPageData(
-      tableData.current.slice(
-        (newPage - 1) * pageLength.current,
-        newPage * pageLength.current
+  // hook 16
+  useEffect(() => {
+    if (
+      ['[object String]', '[object Number]'].includes(
+        Object.prototype.toString.call(filterValue)
       )
-    );
-  };
+    ) {
+      setFilter(filterValue);
+    }
+  }, [filterValue, setFilter]);
 
   // --------------------------------------------------------------------------
-  // Changing page length, setting new pageData and resetting actual page to 1st.
+  // Changing page length, setting new pageData
   const changePageLength = (e) => {
     // change page length
-    pageActual.current = 1; // always go back to first page
     pageLength.current = parseInt(e.target.value, 0); // set new page length
-    setPageData(tableData.current.slice(0, pageLength.current));
-  };
-
-  // --------------------------------------------------------------------------
-  // This function is called on input field change (onChange).
-  // Changing table filter -> calculate new tableData from data
-  // We filter to match all words in filter field to match cell value
-  // E.g. "blue car" filter will match cell "this car is blue"
-  // First we split with regex filter value into groups and then filter
-  // every row and col in data.
-  // From every cell we return [true, false, true,...] => test result for
-  // each of filter words.
-  // with Array.prototype.every we return true/false if all test passed.
-  // Result of all cells in row is then tested with Array.prototype.some
-  // because true should be returned is any cell matches the filter procedure.
-  // (Row should be displayed if any cell matches filter)
-  // After filter we set new tableData, set pageData to first page and reset
-  // pageActual. Setting tableFilterValue we init render.
-  // tableFilterValue is also used to table filter.
-  const fnChangeTableFilter = (e) => {
-    let newTableData = data2.current.slice();
-    if (e.target.value.length) {
-      const testGroups = String(e.target.value).match(/(\S+)/g);
-      newTableData = data2.current.filter((row) =>
-        Object.keys(row).some((col) => {
-          if (row[col]) {
-            // list of results false ,true
-            const test = testGroups.map((g) =>
-              String(row[col]).toLowerCase().includes(g.toLowerCase())
-            );
-            return test.every((t) => t);
-          }
-          return false;
-        })
-      );
-    }
-    tableData.current = newTableData;
-    if (
-      Object.prototype.toString.call(setFilteredData) === '[object Function]'
-    ) {
-      setFilteredData(newTableData);
-    }
-    pageActual.current = 1;
-    tableFilterValue.current = e.target.value;
-    setPageData(tableData.current.slice(0, pageLength.current));
-  };
-
-  // --------------------------------------------------------------------------
-  // Update data without re-rendering table
-  // data in table are updated on row-base, so there is no need
-  // re-render whole table.
-  // But for further operations (paging, sorting, filtering)
-  // must be the actual data prepared.
-  const fnUpdateDataOnEditWithoutRender = (newRow) => {
-    const idxOfUpdatedRowInData2 = data2.current
-      .map((rw) => rw[primaryKey])
-      .indexOf(newRow[primaryKey]);
-    data2.current.splice(idxOfUpdatedRowInData2, 1, newRow);
-    const idxOfUpdatedRowInTableData = tableData.current
-      .map((rw) => rw[primaryKey])
-      .indexOf(newRow[primaryKey]);
-    tableData.current.splice(idxOfUpdatedRowInTableData, 1, newRow);
-    if (
-      Object.prototype.toString.call(setFilteredData) === '[object Function]'
-    ) {
-      setFilteredData((prev) => {
-        const p = prev.slice();
-        const idxOfPrevFilterData = p
-          .map((rw) => rw[primaryKey])
-          .indexOf(newRow[primaryKey]);
-        p.splice(idxOfPrevFilterData, 1, newRow);
-        return p;
-      });
-    }
-  };
-
-  // --------------------------------------------------------------------------
-  // Sort table sorts tableData (which might me already filtered)
-  // afterSorting we preserve actual page (as the number of records does not change).
-  // We use state sortState, so we now which col and what direction the table is
-  // currently sorted. We cycle no-sorting -> asc -> desc -> no-sorting.
-  // in no-sorting after desc (means going to original sorting) we set sortedData
-  // to original data, and have to apply current table filter again.
-
-  const fnSortTable = (col) => {
-    if (!colDefs[col].sortable) return;
-    console.log('SORTING WITH: ', col);
-    let sortedData = [];
-    switch (true) {
-      case sortState.current.col === col && sortState.current.dir === 'asc':
-        sortedData = tableData.current.slice().sort((a, b) => {
-          if (a[col] === null || a[col] === '') return 1;
-          if (b[col] === null || b[col] === '') return -1;
-          if ((a[col] || 0) < (b[col] || 0)) return 1;
-          if ((a[col] || 0) > (b[col] || 0)) return -1;
-          return 0;
-        });
-        tableData.current = sortedData;
-        sortState.current = { col, dir: 'desc' };
-        setPageData(
-          tableData.current.slice(
-            (pageActual.current - 1) * pageLength.current,
-            pageActual.current * pageLength.current
-          )
-        );
-        break;
-      case sortState.current.col === col && sortState.current.dir === 'desc':
-        sortedData = [...data2.current];
-        if (tableFilterValue.current.length) {
-          // have to setup applied table filter, because original sort is taken from original data
-          const testGroups = String(tableFilterValue.current).match(/(\S+)/g);
-          sortedData = data2.current.filter((row) =>
-            Object.keys(row).some((c) => {
-              if (row[c]) {
-                const test = testGroups.map((g) =>
-                  String(row[c]).toLowerCase().includes(g.toLowerCase())
-                ); // list of results false ,true
-                return test.every((t) => t);
-              }
-              return false;
-            })
-          );
-        }
-        tableData.current = sortedData;
-        sortState.current = { col: undefined, dir: undefined };
-        setPageData(
-          tableData.current.slice(
-            (pageActual.current - 1) * pageLength.current,
-            pageActual.current * pageLength.current
-          )
-        );
-        break;
-      default:
-        // first click => sort asc
-        sortedData = tableData.current.slice().sort((a, b) => {
-          if (a[col] === null || a[col] === '') return 1;
-          if (b[col] === null || b[col] === '') return -1;
-          if ((a[col] || 0) < (b[col] || 0)) return -1;
-          if ((a[col] || 0) > (b[col] || 0)) return 1;
-          return 0;
-        });
-        tableData.current = sortedData;
-        sortState.current = { col, dir: 'asc' };
-        setPageData(
-          tableData.current.slice(
-            (pageActual.current - 1) * pageLength.current,
-            pageActual.current * pageLength.current
-          )
-        );
-    }
-  };
-
-  const addRow = () => {
-    tableData.current = data2.current;
-    serverSideEdit({ operation: 'new' })
-      .then((rs) => {
-        console.log('THIS IS FROM SERVER: ', rs);
-        let parsedRes;
-        if (typeof rs === 'string') {
-          try {
-            // try to parse as JSON
-            parsedRes = JSON.parse(rs);
-          } catch (e) {
-            throw Error(`Not a JSON string ${JSON.stringify(e)}`);
-          }
-        } else if (typeof rs === 'object') {
-          try {
-            // try to parse as JSON
-            parsedRes = JSON.parse(JSON.stringify(rs));
-          } catch (e) {
-            throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
-          }
-        } else throw Error('Not a valid JSON string nor JSON object');
-        console.log('PARSED RES: ', parsedRes);
-        data2.current.unshift(parsedRes.data);
-        tableData.current = data2.current.slice();
-        // pageData.current.unshift(nR);
-        activeCell.current = [0, 0];
-        pageActual.current = 1;
-        tableFilterValue.current = '';
-        sortState.current = { col: undefined, dir: undefined };
-        setPageData(tableData.current.slice(0, pageLength.current));
-      })
-      .catch((err) => {
-        throw Error(err);
-      });
-  };
-
-  const removeRow = () => {
-    // prepare deleted data with primaryKey
-    if (
-      !(activeCell.current[0] >= 0) ||
-      !(activeCell.current[1] >= 0) ||
-      !addRemove
-    )
-      return null;
-    const delData = pageData[activeCell.current[1]];
-    serverSideEdit({ operation: 'delete', row: delData })
-      .then((rs) => {
-        let parsedRes;
-        if (typeof rs === 'string') {
-          try {
-            // try to parse as JSON
-            parsedRes = JSON.parse(rs);
-          } catch (e) {
-            throw Error(`Not a JSON string ${JSON.stringify(e)}`);
-          }
-        } else if (typeof rs === 'object') {
-          try {
-            // try to parse as JSON
-            parsedRes = JSON.parse(JSON.stringify(rs));
-          } catch (e) {
-            throw Error(`Not a valid JSON ${JSON.stringify(e)}`);
-          }
-        } else throw Error('Not a valid JSON string nor JSON object');
-        console.log('RESPONSE: ', parsedRes);
-        if (!parsedRes.error) {
-          if (parsedRes.data === 1) {
-            // Modify data2 - remove deletedRow
-            const idxOfDeletedRow = data2.current
-              .map((rw) => rw[primaryKey])
-              .indexOf(delData[primaryKey]);
-            data2.current.splice(idxOfDeletedRow, 1);
-            // Modify tableData - remove deletedRow
-            const idxOfDeletedRowTableData = tableData.current
-              .map((rw) => rw[primaryKey])
-              .indexOf(delData[primaryKey]);
-            tableData.current.splice(idxOfDeletedRowTableData, 1);
-            // calculate new pageActual - you can delete last item on page
-            const allPages = Math.ceil(
-              tableData.current.length / pageLength.current
-            );
-            if (!data2.current.length) {
-              setPageData([]);
-              pageActual.current = 0;
-              activeCell.current = [undefined, undefined];
-            } else if (allPages < pageActual.current) {
-              // last item of last page was deleted => totalPages < pageActual
-              // we have to set last page of new dataSet (shorter of delete line)
-              // set new position for cursor focus
-              activeCell.current = [
-                activeCell.current[0],
-                pageLength.current - 1,
-              ];
-              pageActual.current = allPages;
-              setPageData(
-                tableData.current.slice(
-                  (allPages - 1) * pageLength.current,
-                  allPages * pageLength.current
-                )
-              );
-            } else {
-              setPageData(
-                tableData.current.slice(
-                  (pageActual.current - 1) * pageLength.current,
-                  pageActual.current * pageLength.current
-                )
-              );
-            }
-          } else {
-            // TODO: add modal error
-          }
-        } else {
-        }
-      })
-      .catch((err) => {
-        throw Error(err);
-      });
+    checkPageLength(pageActual, tableData, pageLength);
+    setPageData(
+      tableData.slice(
+        (pageActual.current - 1) * pageLength.current,
+        pageActual.current * pageLength.current
+      )
+    );
   };
 
   const mainTableContainerStyle = () => {
@@ -597,92 +203,176 @@ const GridAct = (props) => {
   };
 
   return (
-    <div
-      className={mainTableContainerClass || 'defaultGridactContainer'}
-      style={mainTableContainerStyle()}
+    <GridContext.Provider
+      value={{
+        data,
+        setData,
+        data2,
+        setData2,
+        tableData,
+        setTableData,
+        setTableDataAdv,
+        pageData,
+        setPageData,
+        colDefs,
+        tableClasses,
+        sortState,
+        fnRowClass,
+        primaryKey,
+        fnSetActiveCell,
+        fnGetActiveCell,
+        fnUpdateRefStore,
+        fnGetRefStore,
+        serverSideEdit,
+        removeRow,
+        wrapperDivClass,
+        onEnterMoveDown,
+        tableCellClass,
+        pageLength,
+        pageActual,
+        setFilter,
+        fnNavigation: (keyCode) =>
+          navigation(
+            keyCode,
+            fnGetActiveCell,
+            fnSetActiveCell,
+            onEnterMoveDown,
+            fnGetRefStore,
+            pageData,
+            colDefs
+          ),
+        fnSortTable: (col) =>
+          fnSortTable(
+            col,
+            tableData,
+            sortState,
+            colDefs,
+            pageLength,
+            pageActual,
+            data2,
+            setTableData
+          ),
+      }}
     >
-      {(showFilter || addRemove || pagingSelector || pageSelector) && (
-        <div className="table-control">
-          {showFilter && (
-            <div className="display-inline">
-              <span className="FFInputDesc">
-                <SearchIcon
-                  style={{
-                    fill: 'var(--crxblue)',
-                    width: '25px',
-                    height: '25px',
+      <div
+        className={mainTableContainerClass || 'defaultGridactContainer'}
+        style={mainTableContainerStyle()}
+      >
+        {(showFilter || addRemove || pagingSelector || pageSelector) && (
+          <div className="table-control">
+            {showFilter && (
+              <div className="display-inline">
+                <span className="FFInputDesc">
+                  <SearchIcon
+                    style={{
+                      fill: 'var(--crxblue)',
+                      width: '25px',
+                      height: '25px',
+                    }}
+                  />
+                </span>
+                <input
+                  className="FFInputField paging-font"
+                  style={{ width: '200px' }}
+                  key="myinputfield"
+                  type="text"
+                  onFocus={(e) => fnSetActiveCell([undefined, undefined])}
+                  placeholder={searchPlaceHolder}
+                  value={filter}
+                  onChange={(e) => {
+                    setFilter(e.target.value);
                   }}
+                  ref={inputFieldRef}
                 />
-              </span>
-              <input
-                className="FFInputField paging-font"
-                style={{ width: '200px' }}
-                key="myinputfield"
-                type="text"
-                onFocus={(e) => fnSetActiveCell([undefined, undefined])}
-                placeholder={searchPlaceHolder}
-                value={tableFilterValue.current}
-                onChange={fnChangeTableFilter}
-                ref={inputFieldRef}
-              />
+              </div>
+            )}
+            <div className="display-inline" ref={buttonsRef}>
+              {addRemove && (
+                <AddRemoveButtons
+                  addRow={() =>
+                    addRow({
+                      tableData,
+                      setTableDataAdv,
+                      serverSideEdit,
+                      data2,
+                      setData2,
+                      setModalWarning,
+                      activeCell,
+                      setFilter,
+                      sortState,
+                      primaryKey,
+                    })
+                  }
+                  removeRowFn={(e) =>
+                    removeRow({
+                      e,
+                      activeCell,
+                      addRemove,
+                      pageData,
+                      serverSideEdit,
+                      data2,
+                      setData2,
+                      primaryKey,
+                      tableData,
+                      setTableDataAdv,
+                      setPageData,
+                      pageActual,
+                      pageLength,
+                      setModalWarning,
+                    })
+                  }
+                  addRemove={addRemove}
+                />
+              )}
             </div>
-          )}
-          <div className="display-inline">
-            {addRemove && (
-              <AddRemoveButtons
-                addRow={addRow}
-                removeRow={removeRow}
-                addRemove={addRemove}
-              />
+            {(pagingSelector || pageSelector) && (
+              <div className="display-inline" style={{ paddingRight: '10px' }}>
+                {pagingSelector && (
+                  <PagingSelector
+                    pageLength={pageLength.current}
+                    changePageLength={changePageLength}
+                    pagingOptions={pagingOptions}
+                    key="10"
+                  />
+                )}
+                {pageSelector && (
+                  <PageSelector
+                    changePage={(dir) =>
+                      changePage(
+                        dir,
+                        pageActual,
+                        tableData,
+                        pageLength,
+                        setPageData
+                      )
+                    }
+                    tableDataLength={tableData.length}
+                    pageLength={pageLength.current}
+                    pageActual={pageActual.current}
+                    key="11"
+                  />
+                )}
+              </div>
             )}
           </div>
-          <div className="display-inline" style={{ paddingRight: '10px' }}>
-            {pagingSelector && (
-              <PagingSelector
-                pageLength={pageLength.current}
-                changePageLength={changePageLength}
-                pagingOptions={pagingOptions}
-                key="10"
-              />
-            )}
-            {pageSelector && (
-              <PageSelector
-                changePage={changePage}
-                tableDataLength={tableData.current.length}
-                pageLength={pageLength.current}
-                pageActual={pageActual.current}
-                key="11"
-              />
-            )}
-          </div>
-        </div>
+        )}
+        <DataTable />
+      </div>
+      {Boolean(modalWarning.length > 0) && (
+        <CellModalWarning
+          cellRef={buttonsRef}
+          show
+          x={250}
+          y={30}
+          setShow={setModalWarning}
+        >
+          <div title={modalWarning}>{modalWarning.slice(0, 50)}</div>
+        </CellModalWarning>
       )}
-
-      <DataTable
-        key="13"
-        pageData={pageData}
-        colDefs={colDefs}
-        tableClasses={tableClasses}
-        sortTable={fnSortTable}
-        sortState={sortState.current}
-        fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
-        fnRowClass={fnRowClass}
-        serverSideEdit={serverSideEdit}
-        primaryKey={primaryKey}
-        fnSetActiveCell={fnSetActiveCell}
-        fnGetActiveCell={fnGetActiveCell}
-        fnUpdateRefStore={fnUpdateRefStore}
-        fnGetRefStore={fnGetRefStore}
-        removeRow={removeRow}
-        wrapperDivClass={wrapperDivClass}
-        onEnterMoveDown={onEnterMoveDown}
-        tableCellClass={tableCellClass}
-        setPageData={setPageData}
-      />
-    </div>
+    </GridContext.Provider>
   );
 };
 
 export default React.memo(GridAct);
 
-//
+// ;

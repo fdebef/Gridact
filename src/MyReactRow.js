@@ -1,49 +1,41 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import MyReactCell from './MyReactCell';
-import propsAreEqual from './propsAreEqual';
+import GridContext from './GridContext/GridContext';
 
 /* eslint-disable react/prop-types */
 
 const MyReactRow = (props) => {
-  const {
-    row,
-    y,
-    fnUpdateRefStore,
-    fnSetActiveCell,
-    colDefs,
-    fnNavigation,
-    fnUpdateDataOnEditWithoutRender,
-    fnRowClass,
-    serverSideEdit,
-    primaryKey,
-    removeRow,
-    tableCellClass,
-    setPageData,
-  } = props;
+  const { row, y } = props;
+
+  const LocalContext = useContext(GridContext);
 
   // --------------------------------------------------------------------------
   // Calculate rowClassNames, based on rowClass parameter
   // tightly controlled on data types
 
   const rowClassNames = (rwDt) => {
-    switch (Object.prototype.toString.call(fnRowClass)) {
+    switch (Object.prototype.toString.call(LocalContext.fnRowClass)) {
       case '[object Function]':
-        return fnRowClass(rwDt);
+        return LocalContext.fnRowClass(rwDt);
       case '[object String]':
-        return fnRowClass;
+        return LocalContext.fnRowClass;
       case '[object Array]':
-        return fnRowClass.join(' ');
+        return LocalContext.fnRowClass.join(' ');
       case '[object Undefined]':
-        return null;
+        return undefined;
       default:
-        return null;
+        return undefined;
     }
   };
 
   return (
     <tr className={rowClassNames(row)} key={y} tabIndex={0}>
-      {Object.keys(colDefs)
-        .filter((cD) => !colDefs[cD].hidden && colDefs[cD].tableHead)
+      {Object.keys(LocalContext.colDefs)
+        .filter(
+          (cD) =>
+            !LocalContext.colDefs[cD].hidden &&
+            LocalContext.colDefs[cD].tableHead
+        )
         .map((col, x) => (
           <MyReactCell
             role="gridcell"
@@ -51,21 +43,16 @@ const MyReactRow = (props) => {
             col={col}
             x={x}
             y={y}
-            cellValue={(() => {
-              if (Object.keys(row).includes(col)) return row[col];
-              return null;
+            cellData={(() => {
+              try {
+                if (Object.keys(row).includes(col)) return row[col];
+                return null;
+              } catch (e) {
+                console.log('ERROR: ', e);
+                console.log('....', row, col);
+              }
             })()}
-            fnUpdateRefStore={fnUpdateRefStore}
-            fnSetActiveCell={fnSetActiveCell}
-            colDefs={colDefs}
-            fnNavigation={fnNavigation}
             row={row}
-            fnUpdateDataOnEditWithoutRender={fnUpdateDataOnEditWithoutRender}
-            setPageData={setPageData}
-            serverSideEdit={serverSideEdit}
-            primaryKey={primaryKey}
-            removeRow={removeRow}
-            tableCellClass={tableCellClass}
           />
         ))}
     </tr>
@@ -73,3 +60,13 @@ const MyReactRow = (props) => {
 };
 
 export default React.memo(MyReactRow);
+
+/* export default React.memo(MyReactRow, (prev, act) => {
+  if (
+    propsAreEqual(prev.row, act.row) &&
+    propsAreEqual(prev.colDefs, act.colDefs)
+  ) {
+    return true;
+  }
+  return propsAreEqual(prev, act);
+}); */
