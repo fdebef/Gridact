@@ -1,5 +1,7 @@
 const fnUpdateData2 = (newRow, row, data2, setData2, primaryKey) => {
+  // data2 is useRef, setData2 is my function
   setData2((pData2) => {
+    // before updating the data, we get index of updated row
     const idxOfUpdatedRowInData2 = pData2
       .map((rw) => rw[primaryKey])
       .indexOf(row[primaryKey]);

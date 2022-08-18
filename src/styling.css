@@ -8,7 +8,7 @@
 .defaultGridactContainer {
     display: inline-grid;
     grid-template-rows: 40px minmax(0, min-content);
-    grid-template-columns: minmax(200px, min-content);
+    grid-template-columns: minmax(200px, max-content);
     justify-content: center;
     align-items: center;
 }

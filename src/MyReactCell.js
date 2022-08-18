@@ -30,10 +30,9 @@ const MyReactCell = function (props) {
     sortState,
     fnRowClass,
     primaryKey,
-    fnSetActiveCell,
-    fnGetActiveCell,
+    activeCell,
+    refStore,
     fnUpdateRefStore,
-    fnGetRefStore,
     serverSideEdit,
     removeRow,
     wrapperDivClass,
@@ -101,11 +100,11 @@ const MyReactCell = function (props) {
       setModalWarningActive(false);
       setModalWarningText('');
     }
-    fnSetActiveCell([undefined, undefined, x, y]);
+    activeCell.current = [undefined, undefined];
   };
 
   const onFoc = () => {
-    fnSetActiveCell([x, y]);
+    activeCell.current = [x, y];
   };
 
   const setWhisperedData = (wd) => {
@@ -150,8 +149,8 @@ const MyReactCell = function (props) {
         .join(' ')}
       style={{
         width: colDefs[col].width,
-        maxWidth: colDefs[col].maxWidth || colDefs[col].width,
-        minWidth: colDefs[col].minWidth || colDefs[col].width,
+        // maxWidth: colDefs[col].maxWidth || colDefs[col].width,
+        // minWidth: colDefs[col].minWidth || colDefs[col].width,
       }}
       role="gridcell"
       key={`${String(y)}-${String(x)}`}

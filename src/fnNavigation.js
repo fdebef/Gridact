@@ -3,10 +3,11 @@
 // and sets focus to calculated cell - based on ref in store
 const navigation = (
   keyCode,
+  activeCell,
   fnGetActiveCell,
   fnSetActiveCell,
+  fnGetRef,
   onEnterMoveDown,
-  fnGetRefStore,
   pageData,
   colDefs
 ) => {
@@ -23,7 +24,7 @@ const navigation = (
   let [calcX, calcY] = fnGetActiveCell();
   const [xCount, yCount] = colRowsCount; // number of columns and rows
   if (keyCode === 'move_next') {
-    onEnterMoveDown ? (keyCode = 'ArrowDown') : (keyCode = 'ArrowRight');
+    keyCode = onEnterMoveDown ? 'ArrowDown' : 'ArrowRight';
   }
   switch (keyCode) {
     case 'ArrowUp': // up
@@ -57,6 +58,6 @@ const navigation = (
       break;
   }
   fnSetActiveCell([calcX, calcY]);
-  fnGetRefStore()[`${String(calcX)}-${String(calcY)}`].current.focus();
+  fnGetRef(calcX, calcY).current.focus();
 };
 export default navigation;

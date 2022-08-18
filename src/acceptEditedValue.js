@@ -16,14 +16,26 @@ const acceptEditedValue = ({
   whisper,
   LocalContext,
 }) => {
-  console.log('SETTING EDIT MODE STATE FALSE');
+  // inputEditValue - value from user
+
+  // disable editing mode
   setEditModeStateActive(false);
+
+  // storing current value before edit
   const cellPrevValue = cellValue;
+
+  // prepare operation data
   const operData = { operation: 'edit', newValue: {}, row: { ...row } };
+
+  //
+  // prepare newValue for further processing
+  //
+  // click action
   if (LocalContext.colDefs[col].onCl) {
     operData.operation = 'click';
     operData.newValue[col] = cellPrevValue;
   } else if (!whisper) {
+    // common text edit (not whispering)
     const sanitizedInnerText = fnFilterEditedValue(
       inputEditValue,
       cellValue,
@@ -41,12 +53,19 @@ const acceptEditedValue = ({
       return;
     }
   } else {
+    // whispering input
     // whisper value - object, usually more keys
     operData.newValue = inputEditValue;
   }
 
+  // after setting new value, process data on server
+  // running serverUpdate function, that returns whole updated row
+  // here we solve only editing, not adding/deleting rows
   serverUpdate(operData, LocalContext.colDefs, LocalContext.serverSideEdit)
     .then((updRow) => {
+      // updRow is response from server
+      // processed and sanitized from errors
+      console.log('THIS IS UPDROW: ', updRow);
       fnUpdateData2(
         updRow,
         row,
@@ -54,15 +73,18 @@ const acceptEditedValue = ({
         LocalContext.setData2,
         LocalContext.primaryKey
       );
+      // update displayed table data
       LocalContext.setTableDataAdv(LocalContext.data2.current);
       setModalWarningActive(false);
       setModalWarningText('');
-      LocalContext.fnNavigation(913); // move cursor
+      cellRef.current.focus();
+      LocalContext.fnNavigation('move_next'); // move cursor
     })
     .catch((err) => {
+      console.log('SOME ERROR HAPPENED: ', err);
       setCellValue(cellPrevValue);
       setModalWarningActive(true);
-      setModalWarningText(JSON.stringify(err));
+      setModalWarningText(JSON.stringify(err.toString()));
       cellRef.current.focus();
     });
 };

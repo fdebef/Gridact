@@ -1,12 +1,17 @@
 const serverUpdate = (dataToSend, colDefs, serverSideEdit) =>
   new Promise((resolve, reject) => {
     try {
+      // remove gridactPrimaryKey, which is not user data
+      // and therefore is not sent to the srever
       delete dataToSend.row.gridactPrimaryKey;
     } catch (e) {}
+    // serverSideEdit is user function which returns new data
     serverSideEdit(dataToSend)
       .then((rs) => {
         // successfull return
         let parsedRes;
+
+        // processing response from server
         if (typeof rs === 'string') {
           try {
             // try to parse as JSON

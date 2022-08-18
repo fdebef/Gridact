@@ -116,8 +116,7 @@ const GridAct = (props) => {
       resolve('OK');
     });
   const fnGetRefStore = () => refStore.current;
-  const fnGetRef = (x, y) =>
-    refStore.current[`${String(x)}-${String(y)}`].current;
+  const fnGetRef = (x, y) => refStore.current[`${String(x)}-${String(y)}`];
 
   // hook 12
   const [filter, setFilter] = useFilter('', (f) => {
@@ -162,12 +161,15 @@ const GridAct = (props) => {
       activeCell.current[1] > pageData.length - 1
     ) {
       activeCell.current = [activeCell.current[0], pageData.length - 1];
-      fnGetRef(activeCell.current[0], activeCell.current[1]).focus();
+      refStore.current[
+        `${activeCell.current[0]}-${activeCell.current[1]}`
+      ].current.focus();
     } else if (activeCell.current[0] >= 0 && activeCell.current[1] >= 0) {
-      fnGetRef(activeCell.current[0], activeCell.current[1]).focus();
+      refStore.current[
+        `${activeCell.current[0]}-${activeCell.current[1]}`
+      ].current.focus();
     }
   }, [pageData]);
-
   // hook 16
   useEffect(() => {
     if (
@@ -219,10 +221,9 @@ const GridAct = (props) => {
         sortState,
         fnRowClass,
         primaryKey,
-        fnSetActiveCell,
-        fnGetActiveCell,
+        activeCell,
+        refStore,
         fnUpdateRefStore,
-        fnGetRefStore,
         serverSideEdit,
         removeRow,
         wrapperDivClass,
@@ -234,10 +235,11 @@ const GridAct = (props) => {
         fnNavigation: (keyCode) =>
           navigation(
             keyCode,
+            activeCell,
             fnGetActiveCell,
             fnSetActiveCell,
+            fnGetRef,
             onEnterMoveDown,
-            fnGetRefStore,
             pageData,
             colDefs
           ),

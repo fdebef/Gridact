@@ -16,6 +16,11 @@ const keyDnEdit = ({
   LocalContext,
 }) => {
   switch (true) {
+    // CTRL+C, +V, +A
+    case (e.ctrlKey || e.metaKey) &&
+      ['C', 'c', 'V', 'v', 'A', 'a'].includes(e.key):
+      break;
+    // on edit pressing tab, enter, return means accepting
     case ['Tab', 'Enter', 'Return'].includes(e.key): // ENTER + TAB - leave with save
       e.preventDefault();
       acceptEditedValue({
@@ -27,7 +32,6 @@ const keyDnEdit = ({
         setCellValue,
         col,
         row,
-        y,
         cellRef,
         LocalContext,
       });
@@ -47,8 +51,10 @@ const keyDnEdit = ({
       'Delete',
       'Backspace',
     ].includes(e.key):
+      // on edit arrows means moving cursor
       break;
     case !fnFilterEditChar(e.key, cellValue, row, col, LocalContext.colDefs):
+      // if not allowed character, do nothing
       e.preventDefault();
       break;
     default:
