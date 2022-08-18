@@ -24,6 +24,12 @@ Gridact is React component for displaying large datasets in table supporting
 
 ##**[Live demo](https://codesandbox.io/s/gridact-89khh) on CodeSandBox**
 
+**Please open the project in window (https://89khh.codesandbox.io/), not in CodeSandBox browser, does not work.**
+
+##Changelog 3.1.0 (2022-08-18)
+- optimized version, a lot of changes in code, coded splitted into more modules for better readability.
+- added cross-application gridactContext, which made it much better administratable.
+- primaryKey property no longer user, module calculates its own.
 
 ##Changelog 2.5.0
 - new format of data from edit, simplier `{newValue, column, row}` From Row you can find whatever identification you need.
@@ -102,7 +108,6 @@ const App = () => {
     }
     serverSideEdit={editData => YourApi('yourUri', editData)
     }
-    primaryKey="line_id"
     showFilter
     addRemove
     pageSelector
@@ -166,11 +171,6 @@ Type: _String | Array | function_ _\<option>_<br>
 String or Array of classNames<br>
 If function is provided, it is passed row data. Must return String or Array.
 Used e.g. for coloring cells based on row data.
-
-### primaryKey ###
-Type: String **\<mandatory\>**<br>
-Key from colDefs, where data primary key is stored. Is necessary for proper function of component.
-primaryKey must be included in colDefs, but you can hide it (hidden property)
 
 ### initSort ###
 Type: _Object \<option>_<br>
