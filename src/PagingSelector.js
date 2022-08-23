@@ -1,5 +1,5 @@
 import React from 'react';
-import MultiPages from '../../static/images/icons/paging.svg';
+import MultiPages from '../static/images/icons/paging.svg';
 
 const PagingSelector = (props) => {
   const { pageLength, changePageLength, pagingOptions } = props;

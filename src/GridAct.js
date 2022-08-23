@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import SearchIcon from '../../static/images/icons/searchIcon.svg';
+import SearchIcon from '../static/images/icons/searchIcon.svg';
 import './styling.css';
 import './tableStyling.css';
 import DataTable from './DataTable';

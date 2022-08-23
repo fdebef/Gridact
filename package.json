@@ -1,6 +1,6 @@
 {
   "name": "gridact",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "description": "Your Excellent React Grid Component",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,8 @@
   },
   "homepage": "https://github.com/fdebef/Gridact#readme",
   "peerDependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "mdi-react": "^5.4.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -32,14 +31,13 @@
     "@babel/plugin-transform-async-to-generator": "^7.8.3",
     "@babel/preset-env": "^7.9.0",
     "@babel/preset-react": "^7.9.4",
+    "@svgr/webpack": "^6.3.1",
     "babel-loader": "^8.1.0",
     "babel-regenerator-runtime": "^6.5.0",
-    "css-loader": "^2.1.1",
-    "mdi-react": "^5.6.0",
-    "style-loader": "^0.23.1",
-    "webpack": "^4.42.1",
-    "webpack-dev-server": "^3.10.3",
-    "@svgr/webpack": "^5.3.1"
+    "css-loader": "^6.7.1",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.74.0",
+    "webpack-dev-server": "^4.10.0"
   },
   "keywords": [
     "react",
@@ -53,7 +51,8 @@
     "navigation"
   ],
   "dependencies": {
+    "react-transition-group": "^4.4.5",
     "url-loader": "^4.0.0",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^4.10.0"
   }
 }

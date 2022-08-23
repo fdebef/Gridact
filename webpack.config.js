@@ -34,7 +34,6 @@ module.exports = {
   externals: {
     "react": "react",
     "react-dom": "react-dom",
-    "mdi-react": "mdi-react"
   },
 };
 

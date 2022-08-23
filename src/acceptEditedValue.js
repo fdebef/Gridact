@@ -1,5 +1,4 @@
 import serverUpdate from './serverUpdate';
-import setEndOfContentEditable from '../tools/setEndOfContentEditable';
 import fnUpdateData2 from './fnUpdateData2';
 import fnFilterEditedValue from './fnFilterEditedValue';
 

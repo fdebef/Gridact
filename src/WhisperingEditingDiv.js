@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import WhispererInput from '../tools/WhispererInput';
+import WhispererInput from './tools/WhispererInput';
 
 const WhisperingEditingDiv = function ({
   additionalWhisperData,

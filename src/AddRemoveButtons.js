@@ -1,6 +1,6 @@
 import React from 'react';
-import AddRow from '../../static/images/icons/addRow.svg';
-import DeleteRow from '../../static/images/icons/deleteRow.svg';
+import AddRow from '../static/images/icons/addRow.svg';
+import DeleteRow from '../static/images/icons/deleteRow.svg';
 
 const AddRemoveButtons = (props) => {
   const { addRow, removeRowFn } = props;

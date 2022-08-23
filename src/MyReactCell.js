@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 import cellClassNames from './cellClassNames';
 import CellModalWarning from './CellModalWarning';
 import serverUpdate from './serverUpdate';
-import WhispererInput from '../tools/WhispererInput';
+import WhispererInput from './tools/WhispererInput';
 import acceptEditedValue from './acceptEditedValue';
 import keyDnEdit from './keyDnEdit';
 import keyDn from './keyDn';
@@ -10,7 +10,7 @@ import GridContext from './GridContext/GridContext';
 import removeRow from './removeRow';
 import InputEdit from './InputEdit';
 import WhisperingEditingDiv from './WhisperingEditingDiv';
-import SmallModal from '../tools/SmallModal';
+import SmallModal from './tools/SmallModal';
 
 /* eslint-disable react/prop-types */
 const MyReactCell = function (props) {

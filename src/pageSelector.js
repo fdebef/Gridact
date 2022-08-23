@@ -1,8 +1,8 @@
 import React from 'react';
-import PlayEndLeft from '../../static/images/icons/playEndLeft.svg';
-import PlayLeft from '../../static/images/icons/playLeft.svg';
-import PlayRight from '../../static/images/icons/playRight.svg';
-import PlayEndRight from '../../static/images/icons/playEndRight.svg';
+import PlayEndLeft from '../static/images/icons/playEndLeft.svg';
+import PlayLeft from '../static/images/icons/playLeft.svg';
+import PlayRight from '../static/images/icons/playRight.svg';
+import PlayEndRight from '../static/images/icons/playEndRight.svg';
 
 const PageSelector = (props) => {
   const { changePage, tableDataLength, pageLength, pageActual } = props;

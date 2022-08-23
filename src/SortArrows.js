@@ -1,6 +1,6 @@
 import React from 'react';
-import SortNone from '../../static/images/icons/sortNoneEmpty.svg';
-import SortUp from '../../static/images/icons/sortUp.svg';
+import SortNone from '../static/images/icons/sortNoneEmpty.svg';
+import SortUp from '../static/images/icons/sortUp.svg';
 
 const SortArrows = (prop) => {
   const { colDefs, col, sortState } = prop;
